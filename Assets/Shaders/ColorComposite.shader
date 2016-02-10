@@ -87,7 +87,7 @@
 
 	struct ProteinIngredientInfo
 	{
-		float proteinIngredientType;
+		float proteinIngredientGroupId;
 		float numChains;
 		float chainColorStartIndex;
 		float w;
@@ -119,6 +119,8 @@
 	uniform Texture2D<int> _AtomIdBuffer;
 	uniform Texture2D<int> _InstanceIdBuffer;
 
+
+	uniform int _level;
 	//*****//
 
 	void frag1(v2f_img i, out float4 color : COLOR0)
@@ -130,7 +132,7 @@
 
 		float eyeDepth = abs(LinearEyeDepth(_DepthBuffer[uv]));
 
-		if (eyeDepth > 50) discard;
+//		if (eyeDepth > 50) discard;
 
 
 		color = float4(0, 0, 0, 1);
@@ -146,7 +148,7 @@
 			float4 aminoAcidColor = _AminoAcidColors[atomInfo.residueSymbolId];
 			float4 proteinIngredientsChainColors = _ProteinIngredientsChainColors[proteinIngredientInfo.chainColorStartIndex + atomInfo.chainSymbolId];
 			float4 proteinIngredientsColors = _ProteinIngredientsColors[proteinInstanceInfo.proteinIngredientType];
-			float4 ingredientGroupColor = _IngredientGroupsColor[proteinIngredientInfo.proteinIngredientType];
+			float4 ingredientGroupColor = _IngredientGroupsColor[proteinIngredientInfo.proteinIngredientGroupId];
 						
 			color = ingredientGroupColor;
 			return;
@@ -154,9 +156,9 @@
 			////*******//
 
 			float3 proteinRandomValues = _ProteinIngredientsRandomValues[proteinInstanceInfo.proteinIngredientType].xyz;
-			float ingredientGroupsLerpFactors = _IngredientGroupsLerpFactors[proteinIngredientInfo.proteinIngredientType];
-			float3 ingredientGroupsColorValues = _IngredientGroupsColorValues[proteinIngredientInfo.proteinIngredientType].xyz;
-			float3 ingredientGroupsColorRanges = _IngredientGroupsColorRanges[proteinIngredientInfo.proteinIngredientType].xyz;
+			float ingredientGroupsLerpFactors = _IngredientGroupsLerpFactors[proteinIngredientInfo.proteinIngredientGroupId];
+			float3 ingredientGroupsColorValues = _IngredientGroupsColorValues[proteinIngredientInfo.proteinIngredientGroupId].xyz;
+			float3 ingredientGroupsColorRanges = _IngredientGroupsColorRanges[proteinIngredientInfo.proteinIngredientGroupId].xyz;
 
 			float h = ingredientGroupsColorValues.x + (ingredientGroupsColorRanges.x) * (proteinRandomValues.x - 0.5f) * ingredientGroupsLerpFactors;
 			float c = ingredientGroupsColorValues.y + (ingredientGroupsColorRanges.y) * (proteinRandomValues.x - 0.5f) * ingredientGroupsLerpFactors;

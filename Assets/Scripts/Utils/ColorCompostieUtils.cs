@@ -8,6 +8,8 @@ public static class ColorCompositeUtils
     {
         // Generated textures
 
+        colorCompositeMaterial.SetInt("_level", ColorManager.Get.level);
+
         colorCompositeMaterial.SetTexture("_DepthBuffer", depthBuffer);
         colorCompositeMaterial.SetTexture("_AtomIdBuffer", atomIdBuffer);
         colorCompositeMaterial.SetTexture("_InstanceIdBuffer", instanceIdBuffer);

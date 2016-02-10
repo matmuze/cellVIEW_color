@@ -40,6 +40,8 @@ public class ColorManager : MonoBehaviour
 
     //*******//
 
+    public int level;
+
     public void InitColors()
     {
         CPUBuffers.Get.ProteinIngredientsProperties.Clear();
