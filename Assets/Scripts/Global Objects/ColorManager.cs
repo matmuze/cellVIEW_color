@@ -109,34 +109,135 @@ public class ColorManager : MonoBehaviour
     public void ReloadColors()
     {
         Debug.Log("Reloading colors !!");
-
-        CPUBuffers.Get.IngredientGroupsColor.Clear();
-        CPUBuffers.Get.ProteinIngredientsColors.Clear();
-        CPUBuffers.Get.ProteinIngredientsChainColors.Clear();
-
-        foreach (var group in SceneManager.Get.IngredientGroups)
-        {
-            var currentHue = hueShifts[group.unique_id] * 360.0f;
-            CPUBuffers.Get.IngredientGroupsColor.Add(MyUtility.ColorFromHSV(currentHue, 1, 1));
-            //CPUBuffers.Get.IngredientGroupsColor.Add(Color.blue);
-
-            foreach (var ingredient in group.Ingredients)
-            {
-                var currentChroma = Random.Range(0.5f, 1);
-                CPUBuffers.Get.ProteinIngredientsColors.Add(MyUtility.ColorFromHSV(currentHue, currentChroma, 1));
-                //CPUBuffers.Get.ProteinIngredientsColors.Add(Color.red);
-
-                for (var j = 0; j < ingredient.nbChains; j++)
-                {
-                    var currentLuminance = Random.Range(0.25f, 1);
-                    CPUBuffers.Get.ProteinIngredientsChainColors.Add(MyUtility.ColorFromHSV(currentHue, currentChroma, currentLuminance));
-                    //CPUBuffers.Get.ProteinIngredientsChainColors.Add(Color.green);
-                }
-            }
-        }
+        setHueCircleColors();
+      
 
         GPUBuffers.Get.IngredientGroupsColor.SetData(CPUBuffers.Get.IngredientGroupsColor.ToArray());
         GPUBuffers.Get.ProteinIngredientsColors.SetData(CPUBuffers.Get.ProteinIngredientsColors.ToArray());
         GPUBuffers.Get.ProteinIngredientsChainColors.SetData(CPUBuffers.Get.ProteinIngredientsChainColors.ToArray());
+
+        GPUBuffers.Get.IngredientGroupsLerpFactors.SetData(CPUBuffers.Get.IngredientGroupsLerpFactors.ToArray());
+        GPUBuffers.Get.IngredientGroupsColorValues.SetData(CPUBuffers.Get.IngredientGroupsColorValues.ToArray());
+        GPUBuffers.Get.IngredientGroupsColorRanges.SetData(CPUBuffers.Get.IngredientGroupsColorRanges.ToArray());
+        GPUBuffers.Get.ProteinIngredientsRandomValues.SetData(CPUBuffers.Get.ProteinIngredientsRandomValues.ToArray());
+
+
+
+
+
     }
+
+
+
+    private void setHueCircleColors()
+    {
+        CPUBuffers.Get.IngredientGroupsColor.Clear();
+        CPUBuffers.Get.IngredientGroupsLerpFactors.Clear();
+        CPUBuffers.Get.IngredientGroupsColorValues.Clear();
+        CPUBuffers.Get.IngredientGroupsColorRanges.Clear();
+        CPUBuffers.Get.ProteinIngredientsRandomValues.Clear();
+        CPUBuffers.Get.ProteinIngredientsChainColors.Clear();
+        CPUBuffers.Get.ProteinIngredientsColors.Clear();
+
+        int[] numMembersIngredientGroups = new int[SceneManager.Get.IngredientGroups.Count];
+        ArrayList numMembersIngredients = new ArrayList();
+        for (int i = 0; i< SceneManager.Get.IngredientGroups.Count; i++)
+        {
+            numMembersIngredientGroups[i] = SceneManager.Get.IngredientGroups[i].Ingredients.Count;
+            for (int j = 0; j< SceneManager.Get.IngredientGroups[i].Ingredients.Count; j++)
+            {
+                numMembersIngredients.Add(SceneManager.Get.IngredientGroups[i].Ingredients[j].nbChains);
+            }
+        }
+        float[] anglefractions;
+        float[] angleCentroids;
+        float[] ingredientsAnglefractions;
+        float[] ingredientsAngleCentroids;
+        float startangle = 0;
+        float endangle = 360;
+        
+        getFractionsAndCentroid(numMembersIngredientGroups, startangle, endangle, out anglefractions, out angleCentroids);
+        getFractionsAndCentroid(numMembersIngredients.OfType<int>().ToArray(), startangle, endangle, out ingredientsAnglefractions, out ingredientsAngleCentroids);
+
+       
+
+
+        for (int i = 0; i< SceneManager.Get.IngredientGroups.Count; i++)
+        {
+            Debug.Log("anglecentroid i " + i + " " + angleCentroids[i]);
+            Debug.Log("anglefractions i "+ i + " " + anglefractions[i]);
+            CPUBuffers.Get.IngredientGroupsColor.Add(new Color(angleCentroids[i]/360f, 60f/100f,60f/100f));
+            var group = SceneManager.Get.IngredientGroups[i];
+            var offsetInc = 1.0f / group.Ingredients.Count;
+            for (int j = 0; j<group.Ingredients.Count; j++)
+            {
+                Debug.Log("j loop i " + i);
+                Debug.Log("loop anglecentroid i " + i + " " + angleCentroids[i]);
+                CPUBuffers.Get.ProteinIngredientsColors.Add(new Vector4(angleCentroids[i] + anglefractions[i] * (j * offsetInc - 0.5f),60,60));
+                CPUBuffers.Get.IngredientGroupsLerpFactors.Add(0);
+                CPUBuffers.Get.IngredientGroupsColorValues.Add(new Vector4(angleCentroids[i], 60, 60));
+                CPUBuffers.Get.IngredientGroupsColorRanges.Add(new Vector4(anglefractions[i], 0, 0));
+                CPUBuffers.Get.ProteinIngredientsRandomValues.Add(new Vector4(j * offsetInc, 0, 0));
+
+                
+                var ingredient = group.Ingredients[j];
+                var chainOffset = 1.0f / ingredient.nbChains;
+                for (int k = 0; k< ingredient.nbChains; k++)
+                {
+                    float currentHue = ingredientsAngleCentroids[j] + (k * chainOffset - 0.5f)*ingredientsAnglefractions[j];
+                    float currentChroma = 60f;
+                    float currentLuminance = 60f;
+                    CPUBuffers.Get.ProteinIngredientsChainColors.Add(new Vector4(Random.value * 360, currentChroma, 30 + Random.value * 40));
+
+                }
+
+            }
+        }
+
+
+
+        
+
+    }
+
+
+
+
+
+    private void getFractionsAndCentroid(int[] numMembers, float startangle, float endangle, out float[] anglefractions, out float[] angleCentroids)
+    {
+        anglefractions = new float[numMembers.Length];
+        angleCentroids = new float[numMembers.Length];
+        float sum = 0;
+        for (int i = 0; i < numMembers.Length; i++)
+        {
+            sum += numMembers[i];
+        }
+        //inbetween angle (since otherwise there will be 2 proteins with the same color at every edge).
+        float inbetweenangle = (endangle - startangle) / 100f; //temp placeholder
+
+
+
+
+        for (int i = 0; i < numMembers.Length; i++)
+        {
+
+            anglefractions[i] = ((endangle-startangle)* (((float)numMembers[i]) / ((float)sum)) - inbetweenangle );
+
+        }
+
+        angleCentroids[0] = 0;
+        float currentcentroid = 0;
+        for (int i = 1; i< numMembers.Length; i++)
+        {
+            currentcentroid += anglefractions[i]/2 + anglefractions[i-1] / 2 + inbetweenangle;
+            angleCentroids[i] = currentcentroid;
+            
+        }
+
+
+
+
+    }
+
 }
