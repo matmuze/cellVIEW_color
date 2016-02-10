@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 
 class OptionsWindow : EditorWindow
 {
@@ -53,5 +54,11 @@ class OptionsWindow : EditorWindow
             EditorGUI.indentLevel--;
         }
         EditorGUILayout.EndToggleGroup();
+
+        // Make all scene dirty to get changes to save
+        if (GUI.changed)
+        {
+            EditorSceneManager.MarkAllScenesDirty();
+        }
     }
 }

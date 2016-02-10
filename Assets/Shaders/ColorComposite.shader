@@ -114,6 +114,8 @@
 
 	//*****//
 
+	uniform Texture2D<float> _DepthBuffer;
+
 	uniform Texture2D<int> _AtomIdBuffer;
 	uniform Texture2D<int> _InstanceIdBuffer;
 
@@ -125,6 +127,11 @@
 				
 		int atomId = _AtomIdBuffer[uv];
 		int instanceId = _InstanceIdBuffer[uv];
+
+		float eyeDepth = abs(LinearEyeDepth(_DepthBuffer[uv]));
+
+		if (eyeDepth > 50) discard;
+
 
 		color = float4(0, 0, 0, 1);
 

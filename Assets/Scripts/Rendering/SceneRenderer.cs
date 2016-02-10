@@ -514,7 +514,7 @@ public class SceneRenderer : MonoBehaviour
         //Graphics.Blit(null, colorBuffer, CompositeMaterial, 3);
 
         //Compute color composition
-        ColorCompositeUtils.ComputeColorComposition(ColorCompositeMaterial, colorBuffer, instanceIdBuffer, atomIdBuffer);
+        ColorCompositeUtils.ComputeColorComposition(ColorCompositeMaterial, colorBuffer, instanceIdBuffer, atomIdBuffer, depthBuffer);
 
         // Compute contours detection
         SetContourShaderParams();

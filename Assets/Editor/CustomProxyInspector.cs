@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEditor;
 using System.Collections.Generic;
+using UnityEditor.SceneManagement;
 
 [CustomEditor(typeof(ColorInspectorProxy))]
 public class CustomProxyInspector : Editor
@@ -45,22 +46,16 @@ public class CustomProxyInspector : Editor
                 CPUBuffers.Get.IngredientGroupsColorValues[i] = hclColor;
                 CPUBuffers.Get.IngredientGroupsColorRanges[i] = hclRange;
             }
-            
-            //EditorGUILayout.Separator();
         }
 
+        // Make all scene dirty to get changes to save
         if (GUI.changed)
         {
-            UploadData();
-            EditorUtility.SetDirty(target);
-        }
-    }
+            EditorSceneManager.MarkAllScenesDirty();
 
-    public void UploadData()
-    {
-        GPUBuffers.Get.IngredientGroupsColorValues.SetData(CPUBuffers.Get.IngredientGroupsColorValues.ToArray());
-        GPUBuffers.Get.IngredientGroupsColorRanges.SetData(CPUBuffers.Get.IngredientGroupsColorRanges.ToArray());
-        GPUBuffers.Get.IngredientGroupsLerpFactors.SetData(CPUBuffers.Get.IngredientGroupsLerpFactors.ToArray());
-        //SceneManager.Get.Getager.CopyDataToGPU();
+            GPUBuffers.Get.IngredientGroupsColorValues.SetData(CPUBuffers.Get.IngredientGroupsColorValues.ToArray());
+            GPUBuffers.Get.IngredientGroupsColorRanges.SetData(CPUBuffers.Get.IngredientGroupsColorRanges.ToArray());
+            GPUBuffers.Get.IngredientGroupsLerpFactors.SetData(CPUBuffers.Get.IngredientGroupsLerpFactors.ToArray());
+        }
     }
 }

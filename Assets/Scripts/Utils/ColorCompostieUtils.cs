@@ -4,10 +4,11 @@ using System.Collections;
 
 public static class ColorCompositeUtils
 {
-    public static void ComputeColorComposition(Material colorCompositeMaterial, RenderTexture dst, RenderTexture instanceIdBuffer, RenderTexture atomIdBuffer)
+    public static void ComputeColorComposition(Material colorCompositeMaterial, RenderTexture dst, RenderTexture instanceIdBuffer, RenderTexture atomIdBuffer, RenderTexture depthBuffer)
     {
         // Generated textures
 
+        colorCompositeMaterial.SetTexture("_DepthBuffer", depthBuffer);
         colorCompositeMaterial.SetTexture("_AtomIdBuffer", atomIdBuffer);
         colorCompositeMaterial.SetTexture("_InstanceIdBuffer", instanceIdBuffer);
 
