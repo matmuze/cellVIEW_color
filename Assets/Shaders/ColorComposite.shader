@@ -227,7 +227,7 @@
 	    	float3 hclMelded = getDepthLuminanceManuFormula(0.99, luminances, HCs);
 
 			color = aminoAcidColor;
-			return;
+		//	return;
 			
 		//	h = hclMelded.x;
 		//	c = hclMelded.y;
