@@ -97,7 +97,7 @@
 
 		float level = floor((depthvalue)* 3) / 3;
 		float lprev = 0;
-		float alpha = ((level + 0.33) - depthvalue) * 3;
+		float alpha = 1-((level + 0.33) - depthvalue) * 3;
 		if (indexlevel > 0) {
 
 		}
@@ -263,7 +263,7 @@
 			HCs[3][0] = 100;
 			HCs[3][1] =50;
 
-	    	float3 hclMelded = getDepthLuminanceManuFormula(0.2, luminances, HCs);
+	    	float3 hclMelded = getDepthLuminanceManuFormula(0.3, luminances, HCs);
 //tbd, temporary replacement because atomcolor is rgb
 			HCs[3][0] = 100;
 			HCs[3][1] =50;
