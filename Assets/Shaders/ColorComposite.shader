@@ -76,7 +76,7 @@
 	{
 		float omega = 0.5;
 		int indexlevel = floor((depthvalue) * 3);
-		float level = floor((depthvalue)* 3 + 0.5) / 3;
+		float level = floor((depthvalue)* 3) / 3;
 		float lprev = 0;
 		float alpha = 1-((level + 0.33) - depthvalue) * 3;
 		if (indexlevel > 0) {
@@ -101,8 +101,8 @@
 
 		//calculate hue
 
-		float h1 = HCs[level][0];
-		float h2 = HCs[level + 1][0];
+		float h1 = HCs[indexlevel][0];
+		float h2 = HCs[indexlevel + 1][0];
 		float angle;
 	/*	if (abs(alpha*h2 - (1-alpha)*h1)>180)
 		{
@@ -111,10 +111,10 @@
 		else {
 			angle = (alpha*h2 + h1);
 		}*/
-		angle = (1-alpha)*h2 + alpha*h1;
+		angle = alpha*h2 + (1-alpha)*h1;
 
 
-		float chroma = alpha*HCs[level][1] + (1 - alpha)*HCs[level + 1];
+		float chroma =  (1 - alpha)*HCs[indexlevel][1] + alpha*HCs[indexlevel + 1][1];
 //		float3 result = float3(angle, chroma, lum);
 		return float3(angle, chroma, lum);
 
@@ -223,8 +223,12 @@
 			luminances[2] = proteinIngredientsChainColors.z;
 			luminances[3] = 50;
 			float4x2 HCs = float4x2(ingredientGroupColor.xy, proteinIngredientsColors.xy, proteinIngredientsChainColors.xy, atomColor.xy);
+			
+			//tbd, temporary replacement because atomcolor is rgb
+			HCs[3][0] = 100;
+			HCs[3][1] =50;
 
-	    	float3 hclMelded = getDepthLuminanceManuFormula(0.99, luminances, HCs);
+	    	float3 hclMelded = getDepthLuminanceManuFormula(0.4, luminances, HCs);
 
 			color = aminoAcidColor;
 		//	return;
