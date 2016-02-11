@@ -97,7 +97,7 @@
 
 		float level = floor((depthvalue)* 3) / 3;
 		float lprev = 0;
-		float alpha = 1-((level + 0.33) - depthvalue) * 3;
+		float alpha = ((level + 0.33) - depthvalue) * 3;
 		if (indexlevel > 0) {
 
 		}
