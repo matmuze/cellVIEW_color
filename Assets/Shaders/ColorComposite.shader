@@ -41,6 +41,24 @@
 		return round(255 * (r <= 0.00304 ? 12.92 * r : 1.055 * pow(r, 1.0 / 2.4) - 0.055));
 	}
 
+
+	float ab_hue(float a, float b) {
+		return atan2(b, a);
+	}
+
+	float ab_chroma(float a, float b) {
+		return sqrt(pow(a, 2) + pow(b, 2));
+	}
+
+	float2 HC_ab(float hue, float chroma) {
+		float d3_radians = 0.01745329252;
+		float a = chroma * cos(hue*d3_radians);
+		float b = chroma * sin(hue*d3_radians);
+
+		return float2( a, b); 
+	}
+
+
 	float3 d3_lab_rgb(float l, float a, float b)
 	{
 		float y = (l + 16.0) / 116.0;
@@ -76,11 +94,11 @@
 	{
 		float omega = 0.5;
 		int indexlevel = floor((depthvalue) * 3);
-		float level = floor((depthvalue)* 3 + 0.5) / 3;
+		float level = floor((depthvalue)* 3) / 3;
 		float lprev = 0;
 		float alpha = 1-((level + 0.33) - depthvalue) * 3;
 		if (indexlevel > 0) {
-			lprev = (1 - alpha)*luminances[indexlevel - 1] + alpha*luminances[indexlevel];//row column, don't know if this works for vectors as well
+			lprev = (1 - alpha)*luminances[indexlevel - 1] +alpha*luminances[indexlevel];//row column, don't know if this works for vectors as well
 		}
 		else {
 			lprev = luminances[indexlevel];
@@ -93,17 +111,19 @@
 			lnext = luminances[indexlevel + 1];
 		}
 		else {
-			if(level<2)
+			if(indexlevel<2)
 			lnext = (1 - alpha)*luminances[indexlevel + 1] +alpha*luminances[indexlevel+2];
 		}
 
-		float lum = (1 - omega)*lprev + omega * 50 + (omega*lnext - 50);
+		float lum = (1 - omega)*lprev + omega * 50 + omega*(lnext - 50);
 
 		//calculate hue
 
-		float h1 = HCs[level][0];
-		float h2 = HCs[level + 1][0];
-		float angle;
+		float h1 = HCs[indexlevel][0];
+		float h2 = HCs[indexlevel + 1][0];
+	//	float angle;
+		float c1 = HCs[indexlevel][1];
+		float c2 = HCs[indexlevel + 1][1];
 	/*	if (abs(alpha*h2 - (1-alpha)*h1)>180)
 		{
 			angle = (alpha*h2+h1) + 180;
@@ -111,10 +131,20 @@
 		else {
 			angle = (alpha*h2 + h1);
 		}*/
-		angle = (1-alpha)*h2 + alpha*h1;
 
 
-		float chroma = alpha*HCs[level][1] + (1 - alpha)*HCs[level + 1];
+		float2 ab1 = HC_ab(h1, c1);
+		float2 ab2 = HC_ab(h2, c2);
+
+		float2 abBlend = (1 - alpha)*ab1 + alpha*ab2;
+		float chroma = ab_chroma(abBlend.x, abBlend.y);
+		float d3_radians = 0.01745329252;
+		float angle = ab_hue(abBlend.x, abBlend.y)/d3_radians;
+
+//		angle = alpha*h2 + (1-alpha)*h1;
+
+
+//		chroma =  (1 - alpha)*HCs[indexlevel][1] + alpha*HCs[indexlevel + 1][1];
 //		float3 result = float3(angle, chroma, lum);
 		return float3(angle, chroma, lum);
 
@@ -223,8 +253,14 @@
 			luminances[2] = proteinIngredientsChainColors.z;
 			luminances[3] = 50;
 			float4x2 HCs = float4x2(ingredientGroupColor.xy, proteinIngredientsColors.xy, proteinIngredientsChainColors.xy, atomColor.xy);
+		//	float[5][2] test;
+			//tbd, temporary replacement because atomcolor is rgb
+			HCs[3][0] = 100;
+			HCs[3][1] =50;
 
-	    	float3 hclMelded = getDepthLuminanceManuFormula(0.99, luminances, HCs);
+	    	float3 hclMelded = getDepthLuminanceManuFormula(0.2, luminances, HCs);
+		//	hclMelded.z = proteinIngredientsColors.z;
+		//	hclMelded.z = 70;
 
 			color = aminoAcidColor;
 		//	return;
@@ -247,7 +283,12 @@
 	//	 	 float c = ingredientGroupsColorValues.y + (ingredientGroupsColorRanges.y) * (proteinRandomValues.x - 0.5f) * ingredientGroupsLerpFactors;
 	//		 float l = ingredientGroupsColorValues.z + (ingredientGroupsColorRanges.z) * (proteinRandomValues.x - 0.5f) * ingredientGroupsLerpFactors;
 			
-			color = float4(d3_hcl_lab(hclMelded.x, hclMelded.y, hclMelded.z), 1);
+		color = float4(d3_hcl_lab(hclMelded.x, hclMelded.y, hclMelded.z), 1);
+		//	color = float4(hclMelded.z/100, hclMelded.z/100, hclMelded.z/100, 1);
+			//float testlum = (proteinIngredientsColors.z+40) / 100;// hclMelded.z;
+			
+			//color = float4(d3_hcl_lab(0, 0, proteinIngredientsColors.z), 1);
+			//color = float4(d3_hcl_lab(0, 0, 60), 1);
 		}
 		else
 		{

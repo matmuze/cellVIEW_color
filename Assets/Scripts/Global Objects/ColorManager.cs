@@ -173,9 +173,9 @@ public class ColorManager : MonoBehaviour
             {
                 Debug.Log("j loop i " + i);
                 Debug.Log("loop anglecentroid i " + i + " " + angleCentroids[i]);
-                CPUBuffers.Get.ProteinIngredientsColors.Add(new Vector4(angleCentroids[i] + anglefractions[i] * (j * offsetInc - 0.5f),60,60));
+                CPUBuffers.Get.ProteinIngredientsColors.Add(new Vector4(angleCentroids[i] + anglefractions[i] * (j * offsetInc - 0.5f),60, 60));
                 CPUBuffers.Get.IngredientGroupsLerpFactors.Add(0);
-                CPUBuffers.Get.IngredientGroupsColorValues.Add(new Vector4(angleCentroids[i], 60, 60));
+                CPUBuffers.Get.IngredientGroupsColorValues.Add(new Vector4(angleCentroids[i], 60, 90));// 15 + Random.value * 85));
                 CPUBuffers.Get.IngredientGroupsColorRanges.Add(new Vector4(anglefractions[i], 0, 0));
                 CPUBuffers.Get.ProteinIngredientsRandomValues.Add(new Vector4(j * offsetInc, 0, 0));
 
