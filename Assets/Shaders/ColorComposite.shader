@@ -94,11 +94,12 @@
 	{
 		float omega = 0.5;
 		int indexlevel = floor((depthvalue) * 3);
+
 		float level = floor((depthvalue)* 3) / 3;
 		float lprev = 0;
 		float alpha = 1-((level + 0.33) - depthvalue) * 3;
 		if (indexlevel > 0) {
-			lprev = (1 - alpha)*luminances[indexlevel - 1] +alpha*luminances[indexlevel];//row column, don't know if this works for vectors as well
+
 		}
 		else {
 			lprev = luminances[indexlevel];
@@ -115,9 +116,11 @@
 			lnext = (1 - alpha)*luminances[indexlevel + 1] +alpha*luminances[indexlevel+2];
 		}
 
+
 		float lum = (1 - omega)*lprev + omega * 50 + omega*(lnext - 50);
 
 		//calculate hue
+
 
 		float h1 = HCs[indexlevel][0];
 		float h2 = HCs[indexlevel + 1][0];
@@ -131,6 +134,8 @@
 		else {
 			angle = (alpha*h2 + h1);
 		}*/
+
+
 
 
 		float2 ab1 = HC_ab(h1, c1);
@@ -253,14 +258,15 @@
 			luminances[2] = proteinIngredientsChainColors.z;
 			luminances[3] = 50;
 			float4x2 HCs = float4x2(ingredientGroupColor.xy, proteinIngredientsColors.xy, proteinIngredientsChainColors.xy, atomColor.xy);
-		//	float[5][2] test;
+			
 			//tbd, temporary replacement because atomcolor is rgb
 			HCs[3][0] = 100;
 			HCs[3][1] =50;
 
 	    	float3 hclMelded = getDepthLuminanceManuFormula(0.2, luminances, HCs);
-		//	hclMelded.z = proteinIngredientsColors.z;
-		//	hclMelded.z = 70;
+//tbd, temporary replacement because atomcolor is rgb
+			HCs[3][0] = 100;
+			HCs[3][1] =50;
 
 			color = aminoAcidColor;
 		//	return;
@@ -283,12 +289,8 @@
 	//	 	 float c = ingredientGroupsColorValues.y + (ingredientGroupsColorRanges.y) * (proteinRandomValues.x - 0.5f) * ingredientGroupsLerpFactors;
 	//		 float l = ingredientGroupsColorValues.z + (ingredientGroupsColorRanges.z) * (proteinRandomValues.x - 0.5f) * ingredientGroupsLerpFactors;
 			
-		color = float4(d3_hcl_lab(hclMelded.x, hclMelded.y, hclMelded.z), 1);
-		//	color = float4(hclMelded.z/100, hclMelded.z/100, hclMelded.z/100, 1);
-			//float testlum = (proteinIngredientsColors.z+40) / 100;// hclMelded.z;
-			
-			//color = float4(d3_hcl_lab(0, 0, proteinIngredientsColors.z), 1);
-			//color = float4(d3_hcl_lab(0, 0, 60), 1);
+			color = float4(d3_hcl_lab(hclMelded.x, hclMelded.y, hclMelded.z), 1);
+		
 		}
 		else
 		{
