@@ -99,7 +99,7 @@
 		float lprev = 0;
 		float alpha = 1-((level + 0.33) - depthvalue) * 3;
 		if (indexlevel > 0) {
-
+			lprev = (1 - alpha)*luminances[indexlevel - 1] + alpha*luminances[indexlevel];
 		}
 		else {
 			lprev = luminances[indexlevel];
@@ -141,7 +141,7 @@
 		float2 ab1 = HC_ab(h1, c1);
 		float2 ab2 = HC_ab(h2, c2);
 
-		float2 abBlend = (1 - alpha)*ab1 + alpha*ab2;
+		float2 abBlend = (1-alpha)*ab1 + alpha*ab2;
 		float chroma = ab_chroma(abBlend.x, abBlend.y);
 		float d3_radians = 0.01745329252;
 		float angle = ab_hue(abBlend.x, abBlend.y)/d3_radians;
@@ -209,6 +209,7 @@
 
 
 	uniform int _level;
+	uniform float _depth;
 	//*****//
 
 	void frag1(v2f_img i, out float4 color : COLOR0)
@@ -256,17 +257,17 @@
 			luminances[0] = ingredientGroupColor.z;
 			luminances[1] = proteinIngredientsColors.z;
 			luminances[2] = proteinIngredientsChainColors.z;
-			luminances[3] = 50;
+			luminances[3] = 70;
 			float4x2 HCs = float4x2(ingredientGroupColor.xy, proteinIngredientsColors.xy, proteinIngredientsChainColors.xy, atomColor.xy);
 			
 			//tbd, temporary replacement because atomcolor is rgb
 			HCs[3][0] = 100;
-			HCs[3][1] =50;
+			HCs[3][1] =70;
 
-	    	float3 hclMelded = getDepthLuminanceManuFormula(0.3, luminances, HCs);
+	    	float3 hclMelded = getDepthLuminanceManuFormula(_depth , luminances, HCs);
 //tbd, temporary replacement because atomcolor is rgb
-			HCs[3][0] = 100;
-			HCs[3][1] =50;
+	//		HCs[3][0] = 100;
+	//		HCs[3][1] =50;
 
 			color = aminoAcidColor;
 		//	return;

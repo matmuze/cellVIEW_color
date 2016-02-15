@@ -7,8 +7,10 @@ public static class ColorCompositeUtils
     public static void ComputeColorComposition(Material colorCompositeMaterial, RenderTexture dst, RenderTexture instanceIdBuffer, RenderTexture atomIdBuffer, RenderTexture depthBuffer)
     {
         // Generated textures
-
+        
         colorCompositeMaterial.SetInt("_level", ColorManager.Get.level);
+        colorCompositeMaterial.SetFloat("_depth", ColorManager.Get.depthSlider);
+       // colorCompositeMaterial.SetFloat("_depth",1- GameObject.FindObjectOfType<MainCameraController>().Distance/250f);
         //possible also with vectors, setvector
 
         colorCompositeMaterial.SetTexture("_DepthBuffer", depthBuffer);

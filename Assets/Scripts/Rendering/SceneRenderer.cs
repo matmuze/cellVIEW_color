@@ -45,6 +45,9 @@ public class SceneRenderer : MonoBehaviour
     [Range(-1, 1)]
     public float GhostContours;
 
+    [Range(0, 10)]
+    public float myslider = 0;
+
     /*****/
 
     void OnEnable()
@@ -514,6 +517,7 @@ public class SceneRenderer : MonoBehaviour
         //Graphics.Blit(null, colorBuffer, CompositeMaterial, 3);
 
         //Compute color composition
+        
         ColorCompositeUtils.ComputeColorComposition(ColorCompositeMaterial, colorBuffer, instanceIdBuffer, atomIdBuffer, depthBuffer);
 
         // Compute contours detection

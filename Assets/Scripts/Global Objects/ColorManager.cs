@@ -14,6 +14,9 @@ public class ColorManager : MonoBehaviour
     // Declare the scene manager as a singleton
     private static ColorManager _instance = null;
 
+    [Range(0, 1)]
+    public float depthSlider = 0;
+
     public static ColorManager Get
     {
         get
@@ -29,6 +32,7 @@ public class ColorManager : MonoBehaviour
                 go = new GameObject("_ColorManager");
                 _instance = go.AddComponent<ColorManager>();
                 //_instance.hideFlags = HideFlags.HideInInspector;
+                _instance.hideFlags = HideFlags.None;
             }
 
             return _instance;
@@ -41,6 +45,8 @@ public class ColorManager : MonoBehaviour
     //*******//
 
     public int level;
+
+
 
     public void InitColors()
     {
@@ -110,7 +116,7 @@ public class ColorManager : MonoBehaviour
     {
         Debug.Log("Reloading colors !!");
         setHueCircleColors();
-      
+        
 
         GPUBuffers.Get.IngredientGroupsColor.SetData(CPUBuffers.Get.IngredientGroupsColor.ToArray());
         GPUBuffers.Get.ProteinIngredientsColors.SetData(CPUBuffers.Get.ProteinIngredientsColors.ToArray());
@@ -122,7 +128,7 @@ public class ColorManager : MonoBehaviour
         GPUBuffers.Get.ProteinIngredientsRandomValues.SetData(CPUBuffers.Get.ProteinIngredientsRandomValues.ToArray());
 
 
-
+        
 
 
     }
@@ -166,14 +172,14 @@ public class ColorManager : MonoBehaviour
         {
             Debug.Log("anglecentroid i " + i + " " + angleCentroids[i]);
             Debug.Log("anglefractions i "+ i + " " + anglefractions[i]);
-            CPUBuffers.Get.IngredientGroupsColor.Add(new Color(angleCentroids[i]/360f, 60f/100f,60f/100f));
+            CPUBuffers.Get.IngredientGroupsColor.Add(new Color(angleCentroids[i]/360f, 60f/100f,70f/100f));
             var group = SceneManager.Get.IngredientGroups[i];
             var offsetInc = 1.0f / group.Ingredients.Count;
             for (int j = 0; j<group.Ingredients.Count; j++)
             {
                 Debug.Log("j loop i " + i);
                 Debug.Log("loop anglecentroid i " + i + " " + angleCentroids[i]);
-                CPUBuffers.Get.ProteinIngredientsColors.Add(new Vector4(angleCentroids[i] + anglefractions[i] * (j * offsetInc - 0.5f),60, 60));
+                CPUBuffers.Get.ProteinIngredientsColors.Add(new Vector4(angleCentroids[i] + anglefractions[i] * (j * offsetInc - 0.5f),60, 70));
                 CPUBuffers.Get.IngredientGroupsLerpFactors.Add(0);
                 CPUBuffers.Get.IngredientGroupsColorValues.Add(new Vector4(angleCentroids[i], 60, 90));// 15 + Random.value * 85));
                 CPUBuffers.Get.IngredientGroupsColorRanges.Add(new Vector4(anglefractions[i], 0, 0));
@@ -187,7 +193,7 @@ public class ColorManager : MonoBehaviour
                     float currentHue = ingredientsAngleCentroids[j] + (k * chainOffset - 0.5f)*ingredientsAnglefractions[j];
                     float currentChroma = 60f;
                     float currentLuminance = 60f;
-                    CPUBuffers.Get.ProteinIngredientsChainColors.Add(new Vector4(Random.value * 360, currentChroma, 30 + Random.value * 40));
+                    CPUBuffers.Get.ProteinIngredientsChainColors.Add(new Vector4(Random.value * 360, currentChroma, 50 + Random.value * 20));
 
                 }
 
