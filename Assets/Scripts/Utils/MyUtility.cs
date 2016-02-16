@@ -568,10 +568,10 @@ public static class MyUtility
     {
         var outBuffer = new ComputeBuffer(1, sizeof(int));
 
-        ComputeShaderManager.Instance.ReadPixelCS.SetInts("_Coord", (int)coord.x, Camera.current.pixelHeight - (int)coord.y);
-        ComputeShaderManager.Instance.ReadPixelCS.SetTexture(0, "_IdTexture", texture);
-        ComputeShaderManager.Instance.ReadPixelCS.SetBuffer(0, "_OutputBuffer", outBuffer);
-        ComputeShaderManager.Instance.ReadPixelCS.Dispatch(0, 1, 1, 1);
+        ComputeShaderManager.Get.ReadPixelCS.SetInts("_Coord", (int)coord.x, Camera.current.pixelHeight - (int)coord.y);
+        ComputeShaderManager.Get.ReadPixelCS.SetTexture(0, "_IdTexture", texture);
+        ComputeShaderManager.Get.ReadPixelCS.SetBuffer(0, "_OutputBuffer", outBuffer);
+        ComputeShaderManager.Get.ReadPixelCS.Dispatch(0, 1, 1, 1);
 
         var pixelId = new[] { 0 };
         outBuffer.GetData(pixelId);

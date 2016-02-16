@@ -1,0 +1,63 @@
+﻿#include "Helper.cginc" 
+
+// Each #kernel tells which function to compile; you can have many kernels
+//#pragma kernel ClearBuffer
+#pragma kernel ComputeCoverage
+
+#pragma kernel CountInstances
+
+uniform Texture2D<int> _InstanceIdBuffer;
+
+StructuredBuffer<ProteinInstanceInfo> _ProteinInstancesInfo;
+StructuredBuffer<ProteinIngredientInfo> _ProteinIngredientsInfo;
+
+RWStructuredBuffer<int> _RWProteinInstanceVisibilityFlags;
+RWStructuredBuffer<IngredientGroupColorInfo> _RWIngredientGroupsColorInfo;
+RWStructuredBuffer<ProteinIngredientColorInfo> _RWProteinIngredientsColorInfo;
+
+[numthreads(8,8,1)]
+void ComputeCoverage (uint3 id : SV_DispatchThreadID)
+{
+	// We have have thead per pixel
+
+	// Fetch the instance id from the current pixel
+	int instanceId = _InstanceIdBuffer[id.xy];
+
+	if(instanceId < 0) return;
+
+	ProteinInstanceInfo proteinInstanceInfo = _ProteinInstancesInfo[instanceId];
+	ProteinIngredientInfo proteinIngredientInfo = _ProteinIngredientsInfo[proteinInstanceInfo.proteinIngredientType];
+
+	// Set the instance visibility flag for the current pixel
+	_RWProteinInstanceVisibilityFlags[instanceId] = 1;
+
+	// Increase screen coverage for the ingredient type which corresponds the instance
+	InterlockedAdd(_RWProteinIngredientsColorInfo[proteinInstanceInfo.proteinIngredientType].screenCoverage, 1);
+
+	// Increase screen coverage for the ingredient group which corresponds the instance
+	InterlockedAdd(_RWIngredientGroupsColorInfo[proteinIngredientInfo.proteinIngredientGroupId].screenCoverage, 1);
+}
+
+[numthreads(8,8,1)]
+void CountInstances (uint3 id : SV_DispatchThreadID)
+{
+	// We have one thread per instance	
+
+	ProteinInstanceInfo proteinInstanceInfo = _ProteinInstancesInfo[id.x];
+	ProteinIngredientInfo proteinIngredientInfo = _ProteinIngredientsInfo[proteinInstanceInfo.proteinIngredientType];
+
+	// Fetch visibilty flag for the current instance
+	int visibilityFlag = _RWProteinInstanceVisibilityFlags[id.x];
+
+	// If the current instance is visible...
+	if(visibilityFlag == 1)
+	{
+		// Increase visible instances counter for the ingredient type
+		InterlockedAdd(_RWProteinIngredientsColorInfo[proteinInstanceInfo.proteinIngredientType].numProteinInstancesVisible, 1);
+
+		// Increase visible instances counter for the ingredient group
+		InterlockedAdd(_RWIngredientGroupsColorInfo[proteinIngredientInfo.proteinIngredientGroupId].numProteinInstancesVisible, 1);	
+	}
+
+	_RWProteinInstanceVisibilityFlags[id.x] = 0;
+}

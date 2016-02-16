@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using Loaders;
 using UnityEditor;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 
 public class CellViewMenuCommands
@@ -15,6 +16,7 @@ public class CellViewMenuCommands
     {
         ColorManager.Get.ReloadColors();
         EditorUtility.SetDirty(SceneManager.Get);
+        EditorSceneManager.MarkAllScenesDirty();
     }
 
     [MenuItem("cellVIEW/Options")]
@@ -29,6 +31,7 @@ public class CellViewMenuCommands
     {
         SceneManager.Get.ClearScene();
         EditorUtility.SetDirty(SceneManager.Get);
+        EditorSceneManager.MarkAllScenesDirty();
     }
 
     // Add menu item named "My Window" to the Window menu
@@ -37,6 +40,7 @@ public class CellViewMenuCommands
     {
         CellPackLoader.LoadCellPackRecipe();
         EditorUtility.SetDirty(SceneManager.Get);
+        EditorSceneManager.MarkAllScenesDirty();
     }
 
     // Add menu item named "My Window" to the Window menu
@@ -45,6 +49,7 @@ public class CellViewMenuCommands
     {
         CellPackLoader.ReloadCellPackRecipe();
         EditorUtility.SetDirty(SceneManager.Get);
+        EditorSceneManager.MarkAllScenesDirty();
     }
 
     // Add menu item named "My Window" to the Window menu
@@ -53,6 +58,7 @@ public class CellViewMenuCommands
     {
         CellPackLoader.LoadCellPackPositions();
         EditorUtility.SetDirty(SceneManager.Get);
+        EditorSceneManager.MarkAllScenesDirty();
     }
 
     // Add menu item named "My Window" to the Window menu
@@ -61,6 +67,7 @@ public class CellViewMenuCommands
     {
         CellPackLoader.ReloadCellPackPositions();
         EditorUtility.SetDirty(SceneManager.Get);
+        EditorSceneManager.MarkAllScenesDirty();
     }
 
     

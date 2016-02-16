@@ -63,13 +63,12 @@ namespace Loaders
                     var ingredient = SceneManager.Get.IngredientGroups[i].Ingredients[j];
 
                     AddProteinIngredient(ref ingredient);
-                    SceneManager.Get.ProteinInstanceCount += SceneManager.Get.IngredientGroups[i].Ingredients[j].nbMol;
+                    SceneManager.Get.ProteinInstanceCount += ingredient.nbMol;
+                    SceneManager.Get.IngredientGroups[i].NumIngredients += ingredient.nbMol;
                 }
             }
 
             ColorManager.Get.InitColors();
-
-            int a = 0;
         }
 
         public static List<Atom> GetAtoms(Ingredient ingredient)
@@ -182,7 +181,7 @@ namespace Loaders
                 }
             }
             
-            SceneManager.Get.AddProteinIngredient(path, atoms, lodProxies);
+            SceneManager.Get.AddProteinIngredientToCPUBuffer(ingredient, atoms, lodProxies);
             Debug.Log("Ingredient added succesfully");
         }
 
@@ -262,7 +261,7 @@ namespace Loaders
                 CPUBuffers.Get.ProteinInstanceRotations.Add(rotation);
             }
 
-            //GPUBuffers.Get.ProteinInstanceInfo.SetData(CPUBuffers.Get.ProteinInstanceInfos.ToArray());
+            //GPUBuffers.Get.ProteinInstancesInfo.SetData(CPUBuffers.Get.ProteinInstanceInfos.ToArray());
             //GPUBuffers.Get.ProteinInstancePositions.SetData(CPUBuffers.Get.ProteinInstancePositions.ToArray());
             //GPUBuffers.Get.ProteinInstanceRotations.SetData(CPUBuffers.Get.ProteinInstanceRotations.ToArray());
 

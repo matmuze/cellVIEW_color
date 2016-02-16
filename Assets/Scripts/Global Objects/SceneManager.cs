@@ -227,21 +227,21 @@ public class SceneManager : MonoBehaviour
 
     //*** Protein Ingredients ****//
 
-    public void AddProteinIngredient(string path, List<Atom> atoms, List<List<Vector4>> clusterLevels = null)
+    public void AddProteinIngredientToCPUBuffer(Ingredient ingredient, List<Atom> atoms, List<List<Vector4>> clusterLevels = null)
     {
-        if (SceneHierarchy.Contains(path))
-            throw new Exception("Invalid protein path: " + path);
-        if (ProteinIngredientNames.Contains(path))
-            throw new Exception("Invalid protein path: " + path);
+        if (SceneHierarchy.Contains(ingredient.path))
+            throw new Exception("Invalid protein path: " + ingredient.path);
+        if (ProteinIngredientNames.Contains(ingredient.path))
+            throw new Exception("Invalid protein path: " + ingredient.path);
 
         if (clusterLevels != null)
         {
             if (NumLodLevels != 0 && NumLodLevels != clusterLevels.Count)
-                throw new Exception("Uneven cluster levels number: " + path);
+                throw new Exception("Uneven cluster levels number: " + ingredient.path);
         }
 
-        AddIngredientToHierarchy(path);
-        ProteinIngredientNames.Add(path);
+        AddIngredientToHierarchy(ingredient.path);
+        ProteinIngredientNames.Add(ingredient.path);
 
         CPUBuffers.Get.ProteinToggleFlags.Add(1);
         CPUBuffers.Get.ProteinIngredientsRadii.Add(AtomHelper.ComputeRadius(atoms));
@@ -249,7 +249,7 @@ public class SceneManager : MonoBehaviour
         CPUBuffers.Get.ProteinAtomCount.Add(atoms.Count);
         CPUBuffers.Get.ProteinAtomStart.Add(CPUBuffers.Get.ProteinAtoms.Count);
 
-        for (int i = 0; i < atoms.Count; i++)
+        for (var i = 0; i < atoms.Count; i++)
         {
             CPUBuffers.Get.ProteinAtoms.Add(new Vector4(atoms[i].position.x, atoms[i].position.y, atoms[i].position.z, atoms[i].radius));
             CPUBuffers.Get.ProteinAtomInfo.Add(new Vector4(i, atoms[i].symbolId, atoms[i].residueId, atoms[i].chainId));

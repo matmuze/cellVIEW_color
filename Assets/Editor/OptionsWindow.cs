@@ -58,6 +58,8 @@ class OptionsWindow : EditorWindow
         // Make all scene dirty to get changes to save
         if (GUI.changed)
         {
+            EditorUtility.SetDirty(SceneManager.Get);
+            EditorUtility.SetDirty(GlobalProperties.Get);
             EditorSceneManager.MarkAllScenesDirty();
         }
     }

@@ -235,20 +235,20 @@ public class SceneRenderer : MonoBehaviour
         // Always clear append buffer before usage
         GPUBuffers.Get.SphereBatches.ClearAppendBuffer();
 
-        ComputeShaderManager.Instance.SphereBatchCS.SetFloat("_Scale", GlobalProperties.Get.Scale);
-        ComputeShaderManager.Instance.SphereBatchCS.SetInt("_NumLevels", SceneManager.Get.NumLodLevels);
-        ComputeShaderManager.Instance.SphereBatchCS.SetInt("_NumInstances", SceneManager.Get.NumLipidInstances);
-        ComputeShaderManager.Instance.SphereBatchCS.SetInt("_EnableLod", Convert.ToInt32(GlobalProperties.Get.EnableLod));
-        ComputeShaderManager.Instance.SphereBatchCS.SetVector("_CameraForward", GetComponent<Camera>().transform.forward);
-        ComputeShaderManager.Instance.SphereBatchCS.SetVector("_CameraPosition", GetComponent<Camera>().transform.position);
-        ComputeShaderManager.Instance.SphereBatchCS.SetFloats("_FrustrumPlanes", MyUtility.FrustrumPlanesAsFloats(GetComponent<Camera>()));
+        ComputeShaderManager.Get.SphereBatchCS.SetFloat("_Scale", GlobalProperties.Get.Scale);
+        ComputeShaderManager.Get.SphereBatchCS.SetInt("_NumLevels", SceneManager.Get.NumLodLevels);
+        ComputeShaderManager.Get.SphereBatchCS.SetInt("_NumInstances", SceneManager.Get.NumLipidInstances);
+        ComputeShaderManager.Get.SphereBatchCS.SetInt("_EnableLod", Convert.ToInt32(GlobalProperties.Get.EnableLod));
+        ComputeShaderManager.Get.SphereBatchCS.SetVector("_CameraForward", GetComponent<Camera>().transform.forward);
+        ComputeShaderManager.Get.SphereBatchCS.SetVector("_CameraPosition", GetComponent<Camera>().transform.position);
+        ComputeShaderManager.Get.SphereBatchCS.SetFloats("_FrustrumPlanes", MyUtility.FrustrumPlanesAsFloats(GetComponent<Camera>()));
 
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(2, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(2, "_LipidInstancePositions", GPUBuffers.Get.LipidInstancePositions);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(2, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(2, "_LipidInstanceOcclusionFlags", GPUBuffers.Get.LipidInstanceOcclusionFlags);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(2, "_LipidSphereBatches", GPUBuffers.Get.SphereBatches);
-        ComputeShaderManager.Instance.SphereBatchCS.Dispatch(2, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(2, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(2, "_LipidInstancePositions", GPUBuffers.Get.LipidInstancePositions);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(2, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(2, "_LipidInstanceOcclusionFlags", GPUBuffers.Get.LipidInstanceOcclusionFlags);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(2, "_LipidSphereBatches", GPUBuffers.Get.SphereBatches);
+        ComputeShaderManager.Get.SphereBatchCS.Dispatch(2, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
         ComputeBuffer.CopyCount(GPUBuffers.Get.SphereBatches, GPUBuffers.Get.ArgBuffer, 0);
 
     }
@@ -371,7 +371,7 @@ public class SceneRenderer : MonoBehaviour
     //    CompositeMaterial.SetTexture("_IdTexture", itemBuffer);
     //    CompositeMaterial.SetBuffer("_IngredientStates", GPUBuffers.Get.IngredientStates);
     //    CompositeMaterial.SetBuffer("_ProteinColors", GPUBuffers.Get.ProteinIngredientsColors);
-    //    CompositeMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstanceInfo);
+    //    CompositeMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
     //    CompositeMaterial.SetBuffer("_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
     //    Graphics.Blit(null, colorBuffer, CompositeMaterial, 3);
 
@@ -393,7 +393,7 @@ public class SceneRenderer : MonoBehaviour
     //    ////ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(5, "_ProteinInstanceVisibilityFlags", GPUBuffers.Get.ProteinInstanceOcclusionFlags);
     //    ////ComputeShaderManager.Get.ComputeVisibilityCS.Dispatch(5, Mathf.CeilToInt(ShadowMap2.width / 8.0f), Mathf.CeilToInt(ShadowMap2.height / 8.0f), 1);
 
-    //    //////CompositeMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstanceInfo);
+    //    //////CompositeMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
     //    //////CompositeMaterial.SetBuffer("_ProteinAtomCount", GPUBuffers.Get.ProteinAtomCount);
 
     //    //////CompositeMaterial.SetTexture("_IdTexture", itemBuffer);
@@ -517,7 +517,8 @@ public class SceneRenderer : MonoBehaviour
         //Graphics.Blit(null, colorBuffer, CompositeMaterial, 3);
 
         //Compute color composition
-        
+        ColorCompositeUtils.ComputeCoverage(instanceIdBuffer);
+        ColorCompositeUtils.CountInstances();
         ColorCompositeUtils.ComputeColorComposition(ColorCompositeMaterial, colorBuffer, instanceIdBuffer, atomIdBuffer, depthBuffer);
 
         // Compute contours detection
@@ -587,8 +588,8 @@ public class SceneRenderer : MonoBehaviour
         //    //ColorCompositeMaterial.SetBuffer("_ProteinColors", GPUBuffers.Get.ProteinIngredientsColors);
         //    //ColorCompositeMaterial.SetBuffer("_AminoAcidColors", GPUBuffers.Get.AminoAcidColors);
         //    //ColorCompositeMaterial.SetBuffer("_ProteinAtomInfos", GPUBuffers.Get.ProteinAtomInfo);
-        //    //ColorCompositeMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstanceInfo);
-        //    //ColorCompositeMaterial.SetBuffer("_IngredientProperties", GPUBuffers.Get.ProteinIngredientProperties);
+        //    //ColorCompositeMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
+        //    //ColorCompositeMaterial.SetBuffer("_IngredientProperties", GPUBuffers.Get.ProteinIngredientsInfo);
         //    //ColorCompositeMaterial.SetBuffer("_IngredientGroupsColor", GPUBuffers.Get.IngredientGroupsColor);
 
         //    ///********/

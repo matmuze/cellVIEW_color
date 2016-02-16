@@ -12,9 +12,11 @@ public class ComputeShaderManager : MonoBehaviour
     public ComputeShader ObjectSpaceCutAwaysCS;
     public ComputeShader ComputeVisibilityCS;
 
+    public ComputeShader ComputeColorInfo;
+
     // Declare the shader manager as a singleton
     private static ComputeShaderManager _instance = null;
-    public static ComputeShaderManager Instance
+    public static ComputeShaderManager Get
     {
         get
         {

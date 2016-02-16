@@ -4,13 +4,13 @@
 	{
 		_MainTex("Base (RGB) Trans (A)", 2D) = "white" {}
 	}
-
-
+		
 	CGINCLUDE
 // Upgrade NOTE: excluded shader from OpenGL ES 2.0 because it uses non-square matrices
 #pragma exclude_renderers gles
 
 	#include "UnityCG.cginc"
+	#include "Helper.cginc"
 
 	float3 Hue(float H)
 	{
@@ -152,38 +152,16 @@
 //		chroma =  (1 - alpha)*HCs[indexlevel][1] + alpha*HCs[indexlevel + 1][1];
 //		float3 result = float3(angle, chroma, lum);
 		return float3(angle, chroma, lum);
-
 	}
-
-
-
-	struct AtomInfo
-	{
-		float atomIndex;
-		float atomSymbolId;
-		float residueSymbolId;
-		float chainSymbolId;
-	};
-
-	struct ProteinInstanceInfo
-	{
-		float proteinIngredientType;
-		float state;
-		float z;
-		float w;
-	};
-
-	struct ProteinIngredientInfo
-	{
-		float proteinIngredientGroupId;
-		float numChains;
-		float chainColorStartIndex;
-		float w;
-	};
+	
+	
 
 	StructuredBuffer<AtomInfo> _ProteinAtomInfos;
 	StructuredBuffer<ProteinInstanceInfo> _ProteinInstanceInfo;
 	StructuredBuffer<ProteinIngredientInfo> _ProteinIngredientProperties;
+
+	StructuredBuffer<IngredientGroupColorInfo> _IngredientGroupsColorInfo;
+	StructuredBuffer<ProteinIngredientColorInfo> _ProteinIngredientsColorInfo;
 
 	//*****//
 
@@ -202,35 +180,77 @@
 
 	//*****//
 
-	uniform Texture2D<float> _DepthBuffer;
-
 	uniform Texture2D<int> _AtomIdBuffer;
 	uniform Texture2D<int> _InstanceIdBuffer;
+	
+	uniform Texture2D<float> _DepthBuffer;
 
+	uniform int _NumPixels;
+	uniform int _DistanceMax;
+	uniform int _NumLevelMax;
+	uniform int _UseDistanceLevels;
+	
+	uniform float4x4 _LevelRanges;
+	uniform float _LevelLerpFactor;
 
-	uniform int _level;
 	uniform float _depth;
 	//*****//
 
+	int GetLevelDistance(int level)
+	{
+		int2 coord = int2(level % 4, level / 4);
+		return _LevelRanges[coord.x][coord.y];
+	}
+
 	void frag1(v2f_img i, out float4 color : COLOR0)
 	{
+		color = float4(1, 0, 0, 1);
+
 		int2 uv = i.uv * _ScreenParams.xy;
 				
 		int atomId = _AtomIdBuffer[uv];
 		int instanceId = _InstanceIdBuffer[uv];
+		float eyeDepth = min(abs(LinearEyeDepth(_DepthBuffer[uv])), _DistanceMax);
 
-		float eyeDepth = abs(LinearEyeDepth(_DepthBuffer[uv]));
+		int level = floor(_LevelLerpFactor);
+		float lerpFactor = _LevelLerpFactor - level;
 
-//		if (eyeDepth > 50) discard;
+		if(_UseDistanceLevels)
+		{
+			level = -1;
 
+			int beginRange = 0;
+			int endRange = 0;
+			for(int i = 0; i < _NumLevelMax; i++)
+			{
+				if(eyeDepth <= GetLevelDistance(i))
+				{
+					level = i;
+					beginRange = (i == 0) ? 0 : GetLevelDistance(i-1);
+					endRange = GetLevelDistance(i);
+					break;
+				}
+			}
 
-		color = float4(0, 0, 0, 1);
+			int lengthCurrentEyePosSegment = eyeDepth - beginRange; 
+			int lengthTotalSegment = endRange - beginRange; 
+			lerpFactor =  (float)lengthCurrentEyePosSegment / (float)lengthTotalSegment;
+		}		
 
 		if (instanceId >= 0)
 		{
 			AtomInfo atomInfo = _ProteinAtomInfos[atomId];
 			ProteinInstanceInfo proteinInstanceInfo = _ProteinInstanceInfo[instanceId];
 			ProteinIngredientInfo proteinIngredientInfo = _ProteinIngredientProperties[proteinInstanceInfo.proteinIngredientType];
+
+			IngredientGroupColorInfo ingredientGroupColorInfo = _IngredientGroupsColorInfo[proteinIngredientInfo.proteinIngredientGroupId];
+			ProteinIngredientColorInfo proteinIngredientColorInfo = _ProteinIngredientsColorInfo[proteinInstanceInfo.proteinIngredientType];
+
+			// To debug color infos
+			//if(_ProteinIngredientsColorInfo[proteinInstanceInfo.proteinIngredientType].numProteinInstances <  1000) discard;	
+			//if((float)proteinIngredientColorInfo.screenCoverage / (float)_NumPixels < 0.25) discard;
+			//if(proteinIngredientColorInfo.numProteinInstancesVisible < 3000) discard;
+					
 
 			// Predefined colors
 			float4 atomColor = _AtomColors[atomInfo.atomSymbolId];
@@ -239,6 +259,39 @@
 			float4 proteinIngredientsColors = _ProteinIngredientsColors[proteinInstanceInfo.proteinIngredientType];
 			float4 ingredientGroupColor = _IngredientGroupsColor[proteinIngredientInfo.proteinIngredientGroupId];
 			
+			float4 atomChainCarbonColor = (atomInfo.atomSymbolId == 0) ? proteinIngredientsChainColors : proteinIngredientsChainColors * (1- 0.25);
+			
+			//int level = 1;
+			//float lerpFactor = _LevelLerpFactor;
+
+			float4 beginColor = float4(0,0,0,0);
+			float4 endColor = float4(0,0,0,0);
+
+			beginColor = (level == 0) ? atomColor : beginColor;
+			endColor = (level == 0) ? atomChainCarbonColor : endColor;
+
+			beginColor = (level == 1) ? atomChainCarbonColor : beginColor;
+			endColor = (level == 1) ? proteinIngredientsChainColors : endColor;
+
+			beginColor = (level == 2) ? proteinIngredientsChainColors : beginColor;
+			endColor = (level == 2) ? proteinIngredientsColors : endColor;
+			
+			beginColor = (level == 3) ? proteinIngredientsColors : beginColor;
+			endColor = (level == 3) ? ingredientGroupColor : endColor;
+
+			beginColor = (level == 4) ? ingredientGroupColor : beginColor;
+			endColor = (level == 4) ? ingredientGroupColor : endColor;
+
+			//beginColor = (level == 3) ? aminoAcidColor : beginColor;
+			//endColor = (level == 3) ? atomColor : endColor;
+			
+			color = lerp(beginColor, endColor, lerpFactor);
+
+			//d3_hcl_lab(hclMelded.x, hclMelded.y, hclMelded.z), 1);
+			//color = float4(d3_hcl_lab(lerpColor.x, lerpColor.y, lerpColor.z), 1);
+
+			return;
+
 			//ingredientgroupcolor is of type color in C#, so i needed to rescale, kind of a hack. Should eventually be changed to vector.
 			ingredientGroupColor.x = ingredientGroupColor.x * 360;
 			ingredientGroupColor.y = ingredientGroupColor.y * 100;

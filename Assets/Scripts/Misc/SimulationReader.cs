@@ -238,7 +238,7 @@ public class SimulationReader : MonoBehaviour
             }
         }
         setupArray();
-        GPUBuffers.Get.ProteinInstanceInfo.SetData(proteinInstanceInfo.ToArray());
+        GPUBuffers.Get.ProteinInstancesInfo.SetData(proteinInstanceInfo.ToArray());
 		if(corrected)
             fs = new FileStream(InputFilePathFixed, FileMode.Open);
         else

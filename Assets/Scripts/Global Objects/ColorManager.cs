@@ -39,12 +39,25 @@ public class ColorManager : MonoBehaviour
         }
     }
 
-    [HideInInspector]
-    public float[] hueShifts = { 0f, 0.6f, 0.2f, 0.8f, 0.4f };
-
     //*******//
 
-    public int level;
+    public int NumLevelMax;
+    
+    public int DistanceMax = 200;
+
+    public bool UseDistanceLevels = false;
+
+    [HideInInspector]
+    public float LevelLerpFactor = 0;
+
+
+    [HideInInspector]
+    public float[] HueShifts = { 0f, 0.6f, 0.2f, 0.8f, 0.4f };
+
+    [HideInInspector]
+    public float[] LevelRanges = new float[0];
+
+    //*******//
 
 
 
@@ -67,7 +80,9 @@ public class ColorManager : MonoBehaviour
 
         foreach (var group in SceneManager.Get.IngredientGroups)
         {
-            var currentHue = hueShifts[group.unique_id] * 360.0f;
+            CPUBuffers.Get.IngredientGroupsColorInfo.Add(new Vector4(group.NumIngredients, 0, 0, 0));
+
+            var currentHue = HueShifts[group.unique_id] * 360.0f;
 
             // Predified group color
             CPUBuffers.Get.IngredientGroupsColor.Add(MyUtility.ColorFromHSV(currentHue, 1, 1));
@@ -87,6 +102,8 @@ public class ColorManager : MonoBehaviour
                 {
                     throw new Exception("Unknown ingredient: " + group.Ingredients[i].path);
                 }
+
+                CPUBuffers.Get.ProteinIngredientsColorInfo.Add(new Vector4(group.Ingredients[i].nbMol, 0, 0, 0));
 
                 var currentChroma = Random.Range(0.5f, 1);
 
@@ -133,8 +150,6 @@ public class ColorManager : MonoBehaviour
 
     }
 
-
-
     private void setHueCircleColors()
     {
         CPUBuffers.Get.IngredientGroupsColor.Clear();
@@ -164,10 +179,7 @@ public class ColorManager : MonoBehaviour
         
         getFractionsAndCentroid(numMembersIngredientGroups, startangle, endangle, out anglefractions, out angleCentroids);
         getFractionsAndCentroid(numMembersIngredients.OfType<int>().ToArray(), startangle, endangle, out ingredientsAnglefractions, out ingredientsAngleCentroids);
-
-       
-
-
+        
         for (int i = 0; i< SceneManager.Get.IngredientGroups.Count; i++)
         {
             Debug.Log("anglecentroid i " + i + " " + angleCentroids[i]);

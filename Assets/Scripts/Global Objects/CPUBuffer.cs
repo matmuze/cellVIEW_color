@@ -95,8 +95,15 @@ public class CPUBuffers : MonoBehaviour
     public List<Vector4> CurveControlPointsNormals = new List<Vector4>();
     [HideInInspector]
     public List<Vector4> CurveControlPointsPositions = new List<Vector4>();
-    
+
     // Color
+
+
+    [HideInInspector]
+    public List<Vector4> IngredientGroupsColorInfo = new List<Vector4>();
+    public List<Vector4> ProteinIngredientsColorInfo = new List<Vector4>();
+
+
     [HideInInspector]
     public List<Vector4> ProteinIngredientsChainColors = new List<Vector4>();
 
@@ -106,6 +113,12 @@ public class CPUBuffers : MonoBehaviour
     public List<Vector4> ProteinIngredientsProperties = new List<Vector4>();
     [HideInInspector]
     public List<Color> IngredientGroupsColor = new List<Color>();
+
+
+
+
+
+
 
     //*******//
 
@@ -219,7 +232,7 @@ public class CPUBuffers : MonoBehaviour
         GPUBuffers.Get.ProteinIngredientsColors.SetData(CPUBuffers.Get.ProteinIngredientsColors.ToArray());
         GPUBuffers.Get.ProteinIngredientsChainColors.SetData(CPUBuffers.Get.ProteinIngredientsChainColors.ToArray());
         GPUBuffers.Get.ProteinAtomInfo.SetData(CPUBuffers.Get.ProteinAtomInfo.ToArray());
-        GPUBuffers.Get.ProteinIngredientProperties.SetData(CPUBuffers.Get.ProteinIngredientsProperties.ToArray());
+        GPUBuffers.Get.ProteinIngredientsInfo.SetData(CPUBuffers.Get.ProteinIngredientsProperties.ToArray());
         GPUBuffers.Get.IngredientGroupsColor.SetData(CPUBuffers.Get.IngredientGroupsColor.ToArray());
 
         //*****//
@@ -251,7 +264,7 @@ public class CPUBuffers : MonoBehaviour
         GPUBuffers.Get.ProteinAtomClusterCount.SetData(CPUBuffers.Get.ProteinAtomClusterCount.ToArray());
         GPUBuffers.Get.ProteinAtomClusterStart.SetData(CPUBuffers.Get.ProteinAtomClusterStart.ToArray());
 
-        GPUBuffers.Get.ProteinInstanceInfo.SetData(CPUBuffers.Get.ProteinInstanceInfos.ToArray());
+        GPUBuffers.Get.ProteinInstancesInfo.SetData(CPUBuffers.Get.ProteinInstanceInfos.ToArray());
         GPUBuffers.Get.ProteinInstancePositions.SetData(CPUBuffers.Get.ProteinInstancePositions.ToArray());
         GPUBuffers.Get.ProteinInstanceRotations.SetData(CPUBuffers.Get.ProteinInstanceRotations.ToArray());
 

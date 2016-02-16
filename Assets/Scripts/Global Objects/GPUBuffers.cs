@@ -98,14 +98,16 @@ public class GPUBuffers : MonoBehaviour
     /********************************/
 
     // Colors
-    public ComputeBuffer ProteinIngredientProperties;
+
+    public ComputeBuffer IngredientGroupsColorInfo;
+    public ComputeBuffer ProteinIngredientsColorInfo;
+
+    public ComputeBuffer ProteinIngredientsInfo;
     public ComputeBuffer IngredientGroupsColor;
     public ComputeBuffer ProteinIngredientsColors;
     public ComputeBuffer ProteinIngredientsChainColors;
     public ComputeBuffer AminoAcidColors;
     public ComputeBuffer AtomColors;
-
-    //******//
 
     public ComputeBuffer IngredientGroupsColorRanges;
     public ComputeBuffer IngredientGroupsColorValues;
@@ -135,7 +137,7 @@ public class GPUBuffers : MonoBehaviour
     public ComputeBuffer ProteinAtomClusterCount;
     public ComputeBuffer ProteinAtomClusterStart;
 
-    public ComputeBuffer ProteinInstanceInfo;
+    public ComputeBuffer ProteinInstancesInfo;
     public ComputeBuffer ProteinInstancePositions;
     public ComputeBuffer ProteinInstanceRotations;
     public ComputeBuffer ProteinInstanceCullFlags;
@@ -210,10 +212,11 @@ public class GPUBuffers : MonoBehaviour
         if (AminoAcidColors == null) AminoAcidColors = new ComputeBuffer(32, 16);
         if (ProteinIngredientsColors == null) ProteinIngredientsColors = new ComputeBuffer(NumProteinTypeMax, 16);
         if (IngredientGroupsColor == null) IngredientGroupsColor = new ComputeBuffer(16, 16);
-        if (ProteinIngredientProperties == null) ProteinIngredientProperties = new ComputeBuffer(NumIngredientMax, 16);
+        if (ProteinIngredientsInfo == null) ProteinIngredientsInfo = new ComputeBuffer(NumIngredientMax, 16);
         if (ProteinIngredientsChainColors == null) ProteinIngredientsChainColors = new ComputeBuffer(NumIngredientMax * 16, 16);
-        
-        //*****//
+
+        if (IngredientGroupsColorInfo == null) IngredientGroupsColorInfo = new ComputeBuffer(16, 16);
+        if (ProteinIngredientsColorInfo == null) ProteinIngredientsColorInfo = new ComputeBuffer(NumIngredientMax, 16);
 
         if (IngredientGroupsLerpFactors == null) IngredientGroupsLerpFactors = new ComputeBuffer(16, 4);
         if (IngredientGroupsColorRanges == null) IngredientGroupsColorRanges = new ComputeBuffer(16, 16);
@@ -243,7 +246,7 @@ public class GPUBuffers : MonoBehaviour
         if (ProteinAtomClusterCount == null) ProteinAtomClusterCount = new ComputeBuffer(NumProteinTypeMax * NumLodMax, 4);
         if (ProteinAtomClusterStart == null) ProteinAtomClusterStart = new ComputeBuffer(NumProteinTypeMax * NumLodMax, 4);
 
-        if (ProteinInstanceInfo == null) ProteinInstanceInfo = new ComputeBuffer(NumProteinInstancesMax, 16);
+        if (ProteinInstancesInfo == null) ProteinInstancesInfo = new ComputeBuffer(NumProteinInstancesMax, 16);
         if (ProteinInstancePositions == null) ProteinInstancePositions = new ComputeBuffer(NumProteinInstancesMax, 16);
         if (ProteinInstanceRotations == null) ProteinInstanceRotations = new ComputeBuffer(NumProteinInstancesMax, 16);
         if (ProteinInstanceCullFlags == null) ProteinInstanceCullFlags = new ComputeBuffer(NumProteinInstancesMax, 4);

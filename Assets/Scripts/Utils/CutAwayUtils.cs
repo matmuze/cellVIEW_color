@@ -9,17 +9,17 @@ public static class CutAwayUtils
     public static void ComputeVisibility(RenderTexture itemBuffer)
     {
         //// Clear Buffer
-        ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(0, "_FlagBuffer", GPUBuffers.Get.ProteinInstanceVisibilityFlags);
-        ComputeShaderManager.Instance.ComputeVisibilityCS.Dispatch(0, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 1), 1, 1);
+        ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(0, "_FlagBuffer", GPUBuffers.Get.ProteinInstanceVisibilityFlags);
+        ComputeShaderManager.Get.ComputeVisibilityCS.Dispatch(0, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 1), 1, 1);
 
-        ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(0, "_FlagBuffer", GPUBuffers.Get.LipidInstanceVisibilityFlags);
-        ComputeShaderManager.Instance.ComputeVisibilityCS.Dispatch(0, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 1), 1, 1);
+        ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(0, "_FlagBuffer", GPUBuffers.Get.LipidInstanceVisibilityFlags);
+        ComputeShaderManager.Get.ComputeVisibilityCS.Dispatch(0, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 1), 1, 1);
 
         // Compute item visibility
-        ComputeShaderManager.Instance.ComputeVisibilityCS.SetTexture(1, "_ItemBuffer", itemBuffer);
-        ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(1, "_ProteinInstanceVisibilityFlags", GPUBuffers.Get.ProteinInstanceVisibilityFlags);
-        ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(1, "_LipidInstanceVisibilityFlags", GPUBuffers.Get.LipidInstanceVisibilityFlags);
-        ComputeShaderManager.Instance.ComputeVisibilityCS.Dispatch(1, Mathf.CeilToInt(itemBuffer.width / 8.0f), Mathf.CeilToInt(itemBuffer.height / 8.0f), 1);
+        ComputeShaderManager.Get.ComputeVisibilityCS.SetTexture(1, "_ItemBuffer", itemBuffer);
+        ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(1, "_ProteinInstanceVisibilityFlags", GPUBuffers.Get.ProteinInstanceVisibilityFlags);
+        ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(1, "_LipidInstanceVisibilityFlags", GPUBuffers.Get.LipidInstanceVisibilityFlags);
+        ComputeShaderManager.Get.ComputeVisibilityCS.Dispatch(1, Mathf.CeilToInt(itemBuffer.width / 8.0f), Mathf.CeilToInt(itemBuffer.height / 8.0f), 1);
     }
 
     public static void FetchHistogramValues()
@@ -29,8 +29,8 @@ public static class CutAwayUtils
         GPUBuffers.Get.Histograms.GetData(histograms);
 
         // Clear histograms
-        ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(2, "_Histograms", GPUBuffers.Get.Histograms);
-        ComputeShaderManager.Instance.ComputeVisibilityCS.Dispatch(2, Mathf.CeilToInt(CPUBuffers.Get.HistogramData.Count / 64.0f), 1, 1);
+        ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(2, "_Histograms", GPUBuffers.Get.Histograms);
+        ComputeShaderManager.Get.ComputeVisibilityCS.Dispatch(2, Mathf.CeilToInt(CPUBuffers.Get.HistogramData.Count / 64.0f), 1, 1);
 
         foreach (var histogram in histograms)
         {
@@ -52,20 +52,20 @@ public static class CutAwayUtils
         if (SceneManager.Get.NumProteinInstances <= 0) return;
 
         // Cutaways params
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetInt("_WeightThreshold", WeightThreshold);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(0, "_IngredientProperties", GPUBuffers.Get.ProteinIngredientProperties);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetInt("_WeightThreshold", WeightThreshold);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(0, "_IngredientProperties", GPUBuffers.Get.ProteinIngredientsInfo);
 
 
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetInt("_NumCutObjects", SceneManager.Get.NumCutObjects);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetInt("_NumIngredientTypes", SceneManager.Get.NumAllIngredients);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(0, "_CutInfos", GPUBuffers.Get.CutInfo);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(0, "_CutScales", GPUBuffers.Get.CutScales);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(0, "_CutPositions", GPUBuffers.Get.CutPositions);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(0, "_CutRotations", GPUBuffers.Get.CutRotations);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(0, "_Histograms", GPUBuffers.Get.Histograms);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(0, "_HistogramsLookup", GPUBuffers.Get.HistogramsLookup);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetInt("_NumCutObjects", SceneManager.Get.NumCutObjects);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetInt("_NumIngredientTypes", SceneManager.Get.NumAllIngredients);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(0, "_CutInfos", GPUBuffers.Get.CutInfo);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(0, "_CutScales", GPUBuffers.Get.CutScales);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(0, "_CutPositions", GPUBuffers.Get.CutPositions);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(0, "_CutRotations", GPUBuffers.Get.CutRotations);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(0, "_Histograms", GPUBuffers.Get.Histograms);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(0, "_HistogramsLookup", GPUBuffers.Get.HistogramsLookup);
 
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetVector("_CameraForward", _camera.transform.forward);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetVector("_CameraForward", _camera.transform.forward);
 
         //ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetTexture(0, "noiseTexture", noiseTexture);
         //ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetFloat("noiseTextureW", noiseTexture.width);
@@ -76,18 +76,18 @@ public static class CutAwayUtils
         //ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(0, "_HistogramProteinTypes", GPUBuffer.Get.HistogramProteinTypes);
 
         // Other params
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetUniform("_Scale", GlobalProperties.Get.Scale);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetUniform("_NumInstances", SceneManager.Get.NumProteinInstances);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetUniform("_Scale", GlobalProperties.Get.Scale);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetUniform("_NumInstances", SceneManager.Get.NumProteinInstances);
 
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(0, "_ProteinRadii", GPUBuffers.Get.ProteinRadii);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(0, "_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstanceInfo);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(0, "_ProteinInstancePositions", GPUBuffers.Get.ProteinInstancePositions);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(0, "_ProteinRadii", GPUBuffers.Get.ProteinRadii);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(0, "_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(0, "_ProteinInstancePositions", GPUBuffers.Get.ProteinInstancePositions);
 
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(0, "_ProteinInstanceCullFlags", GPUBuffers.Get.ProteinInstanceCullFlags);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(0, "_ProteinInstanceOcclusionFlags", GPUBuffers.Get.ProteinInstanceOcclusionFlags);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(0, "_ProteinInstanceVisibilityFlags", GPUBuffers.Get.ProteinInstanceVisibilityFlags);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(0, "_ProteinInstanceCullFlags", GPUBuffers.Get.ProteinInstanceCullFlags);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(0, "_ProteinInstanceOcclusionFlags", GPUBuffers.Get.ProteinInstanceOcclusionFlags);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(0, "_ProteinInstanceVisibilityFlags", GPUBuffers.Get.ProteinInstanceVisibilityFlags);
 
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.Dispatch(0, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.Dispatch(0, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
     }
 
     public static void ComputeLipidObjectSpaceCutAways()
@@ -95,14 +95,14 @@ public static class CutAwayUtils
         if (SceneManager.Get.NumProteinInstances <= 0) return;
 
         // Cutaways params
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetInt("_NumCutObjects", SceneManager.Get.NumCutObjects);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetInt("_NumIngredientTypes", SceneManager.Get.NumAllIngredients);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(1, "_CutInfos", GPUBuffers.Get.CutInfo);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(1, "_CutScales", GPUBuffers.Get.CutScales);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(1, "_CutPositions", GPUBuffers.Get.CutPositions);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(1, "_CutRotations", GPUBuffers.Get.CutRotations);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(1, "_Histograms", GPUBuffers.Get.Histograms);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(1, "_HistogramsLookup", GPUBuffers.Get.HistogramsLookup);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetInt("_NumCutObjects", SceneManager.Get.NumCutObjects);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetInt("_NumIngredientTypes", SceneManager.Get.NumAllIngredients);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(1, "_CutInfos", GPUBuffers.Get.CutInfo);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(1, "_CutScales", GPUBuffers.Get.CutScales);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(1, "_CutPositions", GPUBuffers.Get.CutPositions);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(1, "_CutRotations", GPUBuffers.Get.CutRotations);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(1, "_Histograms", GPUBuffers.Get.Histograms);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(1, "_HistogramsLookup", GPUBuffers.Get.HistogramsLookup);
 
         //ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetTexture(0, "noiseTexture", noiseTexture);
         //ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetFloat("noiseTextureW", noiseTexture.width);
@@ -113,15 +113,15 @@ public static class CutAwayUtils
         //ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(0, "_HistogramProteinTypes", GPUBuffer.Get.HistogramProteinTypes);
 
         // Other params
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetUniform("_Scale", GlobalProperties.Get.Scale);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetUniform("_TypeId", SceneManager.Get.NumProteinInstances);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetUniform("_NumInstances", SceneManager.Get.NumLipidInstances);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(1, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(1, "_LipidInstancePositions", GPUBuffers.Get.LipidInstancePositions);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(1, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(1, "_LipidInstanceVisibilityFlags", GPUBuffers.Get.LipidInstanceVisibilityFlags);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetUniform("_Scale", GlobalProperties.Get.Scale);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetUniform("_TypeId", SceneManager.Get.NumProteinInstances);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetUniform("_NumInstances", SceneManager.Get.NumLipidInstances);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(1, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(1, "_LipidInstancePositions", GPUBuffers.Get.LipidInstancePositions);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(1, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(1, "_LipidInstanceVisibilityFlags", GPUBuffers.Get.LipidInstanceVisibilityFlags);
 
-        ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.Dispatch(1, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.Dispatch(1, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
     }
 
     static void ComputeDistanceTransform(RenderTexture inputTexture, RenderTexture _floodFillTexturePing, RenderTexture _floodFillTexturePong)
@@ -154,78 +154,78 @@ public static class CutAwayUtils
         float widthScale = inputTexture.width / 512.0f;
         float heightScale = inputTexture.height / 512.0f;
 
-        ComputeShaderManager.Instance.FloodFillCS.SetInt("_StepSize", 512 / 2);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Mask", tempBuffer);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Ping", _floodFillTexturePing);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Pong", _floodFillTexturePong);
+        ComputeShaderManager.Get.FloodFillCS.SetInt("_StepSize", 512 / 2);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Mask", tempBuffer);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Ping", _floodFillTexturePing);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Pong", _floodFillTexturePong);
 
-        ComputeShaderManager.Instance.FloodFillCS.SetFloat("_WidthScale", widthScale);
-        ComputeShaderManager.Instance.FloodFillCS.SetFloat("_HeightScale", heightScale);
-        ComputeShaderManager.Instance.FloodFillCS.Dispatch(0, Mathf.CeilToInt(tempBuffer.width / 8.0f), Mathf.CeilToInt(tempBuffer.height / 8.0f), 1);
+        ComputeShaderManager.Get.FloodFillCS.SetFloat("_WidthScale", widthScale);
+        ComputeShaderManager.Get.FloodFillCS.SetFloat("_HeightScale", heightScale);
+        ComputeShaderManager.Get.FloodFillCS.Dispatch(0, Mathf.CeilToInt(tempBuffer.width / 8.0f), Mathf.CeilToInt(tempBuffer.height / 8.0f), 1);
 
-        ComputeShaderManager.Instance.FloodFillCS.SetInt("_StepSize", 512 / 4);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Mask", tempBuffer);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Ping", _floodFillTexturePong);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Pong", _floodFillTexturePing);
-        ComputeShaderManager.Instance.FloodFillCS.SetFloat("_WidthScale", widthScale);
-        ComputeShaderManager.Instance.FloodFillCS.SetFloat("_HeightScale", heightScale);
-        ComputeShaderManager.Instance.FloodFillCS.Dispatch(0, Mathf.CeilToInt(tempBuffer.width / 8.0f), Mathf.CeilToInt(tempBuffer.height / 8.0f), 1);
+        ComputeShaderManager.Get.FloodFillCS.SetInt("_StepSize", 512 / 4);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Mask", tempBuffer);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Ping", _floodFillTexturePong);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Pong", _floodFillTexturePing);
+        ComputeShaderManager.Get.FloodFillCS.SetFloat("_WidthScale", widthScale);
+        ComputeShaderManager.Get.FloodFillCS.SetFloat("_HeightScale", heightScale);
+        ComputeShaderManager.Get.FloodFillCS.Dispatch(0, Mathf.CeilToInt(tempBuffer.width / 8.0f), Mathf.CeilToInt(tempBuffer.height / 8.0f), 1);
 
-        ComputeShaderManager.Instance.FloodFillCS.SetInt("_StepSize", 512 / 8);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Mask", tempBuffer);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Ping", _floodFillTexturePing);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Pong", _floodFillTexturePong);
-        ComputeShaderManager.Instance.FloodFillCS.SetFloat("_WidthScale", widthScale);
-        ComputeShaderManager.Instance.FloodFillCS.SetFloat("_HeightScale", heightScale);
-        ComputeShaderManager.Instance.FloodFillCS.Dispatch(0, Mathf.CeilToInt(tempBuffer.width / 8.0f), Mathf.CeilToInt(tempBuffer.height / 8.0f), 1);
+        ComputeShaderManager.Get.FloodFillCS.SetInt("_StepSize", 512 / 8);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Mask", tempBuffer);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Ping", _floodFillTexturePing);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Pong", _floodFillTexturePong);
+        ComputeShaderManager.Get.FloodFillCS.SetFloat("_WidthScale", widthScale);
+        ComputeShaderManager.Get.FloodFillCS.SetFloat("_HeightScale", heightScale);
+        ComputeShaderManager.Get.FloodFillCS.Dispatch(0, Mathf.CeilToInt(tempBuffer.width / 8.0f), Mathf.CeilToInt(tempBuffer.height / 8.0f), 1);
 
-        ComputeShaderManager.Instance.FloodFillCS.SetInt("_StepSize", 512 / 16);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Mask", tempBuffer);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Ping", _floodFillTexturePong);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Pong", _floodFillTexturePing);
-        ComputeShaderManager.Instance.FloodFillCS.SetFloat("_WidthScale", widthScale);
-        ComputeShaderManager.Instance.FloodFillCS.SetFloat("_HeightScale", heightScale);
-        ComputeShaderManager.Instance.FloodFillCS.Dispatch(0, Mathf.CeilToInt(tempBuffer.width / 8.0f), Mathf.CeilToInt(tempBuffer.height / 8.0f), 1);
+        ComputeShaderManager.Get.FloodFillCS.SetInt("_StepSize", 512 / 16);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Mask", tempBuffer);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Ping", _floodFillTexturePong);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Pong", _floodFillTexturePing);
+        ComputeShaderManager.Get.FloodFillCS.SetFloat("_WidthScale", widthScale);
+        ComputeShaderManager.Get.FloodFillCS.SetFloat("_HeightScale", heightScale);
+        ComputeShaderManager.Get.FloodFillCS.Dispatch(0, Mathf.CeilToInt(tempBuffer.width / 8.0f), Mathf.CeilToInt(tempBuffer.height / 8.0f), 1);
 
-        ComputeShaderManager.Instance.FloodFillCS.SetInt("_StepSize", 512 / 32);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Mask", tempBuffer);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Ping", _floodFillTexturePing);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Pong", _floodFillTexturePong);
-        ComputeShaderManager.Instance.FloodFillCS.SetFloat("_WidthScale", widthScale);
-        ComputeShaderManager.Instance.FloodFillCS.SetFloat("_HeightScale", heightScale);
-        ComputeShaderManager.Instance.FloodFillCS.Dispatch(0, Mathf.CeilToInt(tempBuffer.width / 8.0f), Mathf.CeilToInt(tempBuffer.height / 8.0f), 1);
+        ComputeShaderManager.Get.FloodFillCS.SetInt("_StepSize", 512 / 32);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Mask", tempBuffer);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Ping", _floodFillTexturePing);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Pong", _floodFillTexturePong);
+        ComputeShaderManager.Get.FloodFillCS.SetFloat("_WidthScale", widthScale);
+        ComputeShaderManager.Get.FloodFillCS.SetFloat("_HeightScale", heightScale);
+        ComputeShaderManager.Get.FloodFillCS.Dispatch(0, Mathf.CeilToInt(tempBuffer.width / 8.0f), Mathf.CeilToInt(tempBuffer.height / 8.0f), 1);
 
-        ComputeShaderManager.Instance.FloodFillCS.SetInt("_StepSize", 512 / 64);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Mask", tempBuffer);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Ping", _floodFillTexturePong);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Pong", _floodFillTexturePing);
-        ComputeShaderManager.Instance.FloodFillCS.SetFloat("_WidthScale", widthScale);
-        ComputeShaderManager.Instance.FloodFillCS.SetFloat("_HeightScale", heightScale);
-        ComputeShaderManager.Instance.FloodFillCS.Dispatch(0, Mathf.CeilToInt(tempBuffer.width / 8.0f), Mathf.CeilToInt(tempBuffer.height / 8.0f), 1);
+        ComputeShaderManager.Get.FloodFillCS.SetInt("_StepSize", 512 / 64);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Mask", tempBuffer);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Ping", _floodFillTexturePong);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Pong", _floodFillTexturePing);
+        ComputeShaderManager.Get.FloodFillCS.SetFloat("_WidthScale", widthScale);
+        ComputeShaderManager.Get.FloodFillCS.SetFloat("_HeightScale", heightScale);
+        ComputeShaderManager.Get.FloodFillCS.Dispatch(0, Mathf.CeilToInt(tempBuffer.width / 8.0f), Mathf.CeilToInt(tempBuffer.height / 8.0f), 1);
 
-        ComputeShaderManager.Instance.FloodFillCS.SetInt("_StepSize", 512 / 128);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Mask", tempBuffer);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Ping", _floodFillTexturePing);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Pong", _floodFillTexturePong);
-        ComputeShaderManager.Instance.FloodFillCS.SetFloat("_WidthScale", widthScale);
-        ComputeShaderManager.Instance.FloodFillCS.SetFloat("_HeightScale", heightScale);
-        ComputeShaderManager.Instance.FloodFillCS.Dispatch(0, Mathf.CeilToInt(tempBuffer.width / 8.0f), Mathf.CeilToInt(tempBuffer.height / 8.0f), 1);
+        ComputeShaderManager.Get.FloodFillCS.SetInt("_StepSize", 512 / 128);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Mask", tempBuffer);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Ping", _floodFillTexturePing);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Pong", _floodFillTexturePong);
+        ComputeShaderManager.Get.FloodFillCS.SetFloat("_WidthScale", widthScale);
+        ComputeShaderManager.Get.FloodFillCS.SetFloat("_HeightScale", heightScale);
+        ComputeShaderManager.Get.FloodFillCS.Dispatch(0, Mathf.CeilToInt(tempBuffer.width / 8.0f), Mathf.CeilToInt(tempBuffer.height / 8.0f), 1);
 
-        ComputeShaderManager.Instance.FloodFillCS.SetInt("_StepSize", 512 / 256);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Mask", tempBuffer);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Ping", _floodFillTexturePong);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Pong", _floodFillTexturePing);
-        ComputeShaderManager.Instance.FloodFillCS.SetFloat("_WidthScale", widthScale);
-        ComputeShaderManager.Instance.FloodFillCS.SetFloat("_HeightScale", heightScale);
-        ComputeShaderManager.Instance.FloodFillCS.Dispatch(0, Mathf.CeilToInt(tempBuffer.width / 8.0f), Mathf.CeilToInt(tempBuffer.height / 8.0f), 1);
+        ComputeShaderManager.Get.FloodFillCS.SetInt("_StepSize", 512 / 256);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Mask", tempBuffer);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Ping", _floodFillTexturePong);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Pong", _floodFillTexturePing);
+        ComputeShaderManager.Get.FloodFillCS.SetFloat("_WidthScale", widthScale);
+        ComputeShaderManager.Get.FloodFillCS.SetFloat("_HeightScale", heightScale);
+        ComputeShaderManager.Get.FloodFillCS.Dispatch(0, Mathf.CeilToInt(tempBuffer.width / 8.0f), Mathf.CeilToInt(tempBuffer.height / 8.0f), 1);
 
-        ComputeShaderManager.Instance.FloodFillCS.SetInt("_StepSize", 512 / 512);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Mask", tempBuffer);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Ping", _floodFillTexturePing);
-        ComputeShaderManager.Instance.FloodFillCS.SetTexture(0, "_Pong", _floodFillTexturePong);
-        ComputeShaderManager.Instance.FloodFillCS.SetFloat("_WidthScale", widthScale);
-        ComputeShaderManager.Instance.FloodFillCS.SetFloat("_HeightScale", heightScale);
-        ComputeShaderManager.Instance.FloodFillCS.Dispatch(0, Mathf.CeilToInt(tempBuffer.width / 8.0f), Mathf.CeilToInt(tempBuffer.height / 8.0f), 1);
+        ComputeShaderManager.Get.FloodFillCS.SetInt("_StepSize", 512 / 512);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Mask", tempBuffer);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Ping", _floodFillTexturePing);
+        ComputeShaderManager.Get.FloodFillCS.SetTexture(0, "_Pong", _floodFillTexturePong);
+        ComputeShaderManager.Get.FloodFillCS.SetFloat("_WidthScale", widthScale);
+        ComputeShaderManager.Get.FloodFillCS.SetFloat("_HeightScale", heightScale);
+        ComputeShaderManager.Get.FloodFillCS.Dispatch(0, Mathf.CeilToInt(tempBuffer.width / 8.0f), Mathf.CeilToInt(tempBuffer.height / 8.0f), 1);
 
         RenderTexture.ReleaseTemporary(tempBuffer);
     }
@@ -243,13 +243,13 @@ public static class CutAwayUtils
             GPUBuffers.Get.SphereBatches.ClearAppendBuffer();
 
             //Fill the buffer with occludees
-            ComputeShaderManager.Instance.SphereBatchCS.SetUniform("_NumInstances", SceneManager.Get.NumProteinInstances);
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(1, "_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstanceInfo);
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(1, "_ProteinInstanceCullFlags", GPUBuffers.Get.ProteinInstanceCullFlags);
+            ComputeShaderManager.Get.SphereBatchCS.SetUniform("_NumInstances", SceneManager.Get.NumProteinInstances);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(1, "_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(1, "_ProteinInstanceCullFlags", GPUBuffers.Get.ProteinInstanceCullFlags);
 
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(1, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(1, "_OccludeeSphereBatches", GPUBuffers.Get.SphereBatches);
-            ComputeShaderManager.Instance.SphereBatchCS.Dispatch(1, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(1, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(1, "_OccludeeSphereBatches", GPUBuffers.Get.SphereBatches);
+            ComputeShaderManager.Get.SphereBatchCS.Dispatch(1, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
 
             // Count occludees instances
             ComputeBuffer.CopyCount(GPUBuffers.Get.SphereBatches, GPUBuffers.Get.ArgBuffer, 0);
@@ -257,7 +257,7 @@ public static class CutAwayUtils
             // Prepare draw call
             OcclusionQueriesMaterial.SetFloat("_Scale", GlobalProperties.Get.Scale);
             OcclusionQueriesMaterial.SetBuffer("_ProteinRadii", GPUBuffers.Get.ProteinRadii);
-            OcclusionQueriesMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstanceInfo);
+            OcclusionQueriesMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
             OcclusionQueriesMaterial.SetBuffer("_ProteinInstancePositions", GPUBuffers.Get.ProteinInstancePositions);
             OcclusionQueriesMaterial.SetBuffer("_OccludeeSphereBatches", GPUBuffers.Get.SphereBatches);
             OcclusionQueriesMaterial.SetPass(0);
@@ -274,13 +274,13 @@ public static class CutAwayUtils
             GPUBuffers.Get.SphereBatches.ClearAppendBuffer();
 
             //Fill the buffer with occludees
-            ComputeShaderManager.Instance.SphereBatchCS.SetUniform("_NumInstances", SceneManager.Get.NumLipidInstances);
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(3, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(3, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
+            ComputeShaderManager.Get.SphereBatchCS.SetUniform("_NumInstances", SceneManager.Get.NumLipidInstances);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
 
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(3, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(3, "_OccludeeSphereBatches", GPUBuffers.Get.SphereBatches);
-            ComputeShaderManager.Instance.SphereBatchCS.Dispatch(3, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_OccludeeSphereBatches", GPUBuffers.Get.SphereBatches);
+            ComputeShaderManager.Get.SphereBatchCS.Dispatch(3, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
 
             // Count occludees instances
             ComputeBuffer.CopyCount(GPUBuffers.Get.SphereBatches, GPUBuffers.Get.ArgBuffer, 0);
@@ -300,7 +300,7 @@ public static class CutAwayUtils
         }
     }
 
-    //ComputeShaderManager.Instance.ObjectSpaceCutAwaysCS.SetBuffer(0, "_CutInfos", GPUBuffers.Get.CutInfo);
+    //ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(0, "_CutInfos", GPUBuffers.Get.CutInfo);
 
     public static void ComputeOcclusionMaskGEqual(Material OcclusionQueriesMaterial, RenderTexture tempBuffer, bool maskProtein, bool maskLipid)
     {
@@ -315,13 +315,13 @@ public static class CutAwayUtils
             GPUBuffers.Get.SphereBatches.ClearAppendBuffer();
 
             //Fill the buffer with occludees
-            ComputeShaderManager.Instance.SphereBatchCS.SetUniform("_NumInstances", SceneManager.Get.NumProteinInstances);
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(1, "_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstanceInfo);
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(1, "_ProteinInstanceCullFlags", GPUBuffers.Get.ProteinInstanceCullFlags);
+            ComputeShaderManager.Get.SphereBatchCS.SetUniform("_NumInstances", SceneManager.Get.NumProteinInstances);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(1, "_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(1, "_ProteinInstanceCullFlags", GPUBuffers.Get.ProteinInstanceCullFlags);
 
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(1, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(1, "_OccludeeSphereBatches", GPUBuffers.Get.SphereBatches);
-            ComputeShaderManager.Instance.SphereBatchCS.Dispatch(1, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(1, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(1, "_OccludeeSphereBatches", GPUBuffers.Get.SphereBatches);
+            ComputeShaderManager.Get.SphereBatchCS.Dispatch(1, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
 
             // Count occludees instances
             ComputeBuffer.CopyCount(GPUBuffers.Get.SphereBatches, GPUBuffers.Get.ArgBuffer, 0);
@@ -329,7 +329,7 @@ public static class CutAwayUtils
             // Prepare draw call
             OcclusionQueriesMaterial.SetFloat("_Scale", GlobalProperties.Get.Scale);
             OcclusionQueriesMaterial.SetBuffer("_ProteinRadii", GPUBuffers.Get.ProteinRadii);
-            OcclusionQueriesMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstanceInfo);
+            OcclusionQueriesMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
             OcclusionQueriesMaterial.SetBuffer("_ProteinInstancePositions", GPUBuffers.Get.ProteinInstancePositions);
             OcclusionQueriesMaterial.SetBuffer("_OccludeeSphereBatches", GPUBuffers.Get.SphereBatches);
             OcclusionQueriesMaterial.SetPass(4);
@@ -346,13 +346,13 @@ public static class CutAwayUtils
             GPUBuffers.Get.SphereBatches.ClearAppendBuffer();
 
             //Fill the buffer with occludees
-            ComputeShaderManager.Instance.SphereBatchCS.SetUniform("_NumInstances", SceneManager.Get.NumLipidInstances);
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(3, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(3, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
+            ComputeShaderManager.Get.SphereBatchCS.SetUniform("_NumInstances", SceneManager.Get.NumLipidInstances);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
 
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(3, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(3, "_OccludeeSphereBatches", GPUBuffers.Get.SphereBatches);
-            ComputeShaderManager.Instance.SphereBatchCS.Dispatch(3, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_OccludeeSphereBatches", GPUBuffers.Get.SphereBatches);
+            ComputeShaderManager.Get.SphereBatchCS.Dispatch(3, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
 
             // Count occludees instances
             ComputeBuffer.CopyCount(GPUBuffers.Get.SphereBatches, GPUBuffers.Get.ArgBuffer, 0);
@@ -380,13 +380,13 @@ public static class CutAwayUtils
             GPUBuffers.Get.SphereBatches.ClearAppendBuffer();
 
             //Fill the buffer with occluders
-            ComputeShaderManager.Instance.SphereBatchCS.SetUniform("_NumInstances", SceneManager.Get.NumProteinInstances);
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(1, "_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstanceInfo);
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(1, "_ProteinInstanceCullFlags", GPUBuffers.Get.ProteinInstanceCullFlags);
+            ComputeShaderManager.Get.SphereBatchCS.SetUniform("_NumInstances", SceneManager.Get.NumProteinInstances);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(1, "_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(1, "_ProteinInstanceCullFlags", GPUBuffers.Get.ProteinInstanceCullFlags);
 
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(1, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(1, "_OccludeeSphereBatches", GPUBuffers.Get.SphereBatches);
-            ComputeShaderManager.Instance.SphereBatchCS.Dispatch(1, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(1, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(1, "_OccludeeSphereBatches", GPUBuffers.Get.SphereBatches);
+            ComputeShaderManager.Get.SphereBatchCS.Dispatch(1, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
 
             // Count occluder instances
             ComputeBuffer.CopyCount(GPUBuffers.Get.SphereBatches, GPUBuffers.Get.ArgBuffer, 0);
@@ -394,8 +394,8 @@ public static class CutAwayUtils
             //DebugSphereBatchCount();
 
             // Clear protein occlusion buffer 
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(0, "_FlagBuffer", GPUBuffers.Get.ProteinInstanceOcclusionFlags);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.Dispatch(0, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(0, "_FlagBuffer", GPUBuffers.Get.ProteinInstanceOcclusionFlags);
+            ComputeShaderManager.Get.ComputeVisibilityCS.Dispatch(0, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
 
             // Bind the read/write occlusion buffer to the shader
             // After this draw call the occlusion buffer will be filled with ones if an instance occluded and occludee, zero otherwise
@@ -412,7 +412,7 @@ public static class CutAwayUtils
 
             OcclusionQueriesMaterial.SetFloat("_Scale", GlobalProperties.Get.Scale);
             OcclusionQueriesMaterial.SetBuffer("_ProteinRadii", GPUBuffers.Get.ProteinRadii);
-            OcclusionQueriesMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstanceInfo);
+            OcclusionQueriesMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
             OcclusionQueriesMaterial.SetBuffer("_ProteinInstancePositions", GPUBuffers.Get.ProteinInstancePositions);
             OcclusionQueriesMaterial.SetBuffer("_OccludeeSphereBatches", GPUBuffers.Get.SphereBatches);
             OcclusionQueriesMaterial.SetPass(1);
@@ -421,19 +421,19 @@ public static class CutAwayUtils
             Graphics.DrawProceduralIndirect(MeshTopology.Points, GPUBuffers.Get.ArgBuffer);
             Graphics.ClearRandomWriteTargets();
 
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetUniform("_CutObjectIndex", cutObjectIndex);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetUniform("_NumIngredients", SceneManager.Get.NumAllIngredients);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(3, "_CutInfo", GPUBuffers.Get.CutInfo);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetUniform("_CutObjectIndex", cutObjectIndex);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetUniform("_NumIngredients", SceneManager.Get.NumAllIngredients);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(3, "_CutInfo", GPUBuffers.Get.CutInfo);
 
             //// Discard occluding instances according to value2
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetUniform("_CutObjectId", cutObject.Id);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetUniform("_ConsumeRestoreState", internalState);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(3, "_Histograms", GPUBuffers.Get.Histograms);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(3, "_HistogramsLookup", GPUBuffers.Get.HistogramsLookup);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(3, "_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstanceInfo);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(3, "_ProteinInstanceCullFlags", GPUBuffers.Get.ProteinInstanceCullFlags);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(3, "_ProteinInstanceOcclusionFlags", GPUBuffers.Get.ProteinInstanceOcclusionFlags);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.Dispatch(3, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetUniform("_CutObjectId", cutObject.Id);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetUniform("_ConsumeRestoreState", internalState);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(3, "_Histograms", GPUBuffers.Get.Histograms);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(3, "_HistogramsLookup", GPUBuffers.Get.HistogramsLookup);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(3, "_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(3, "_ProteinInstanceCullFlags", GPUBuffers.Get.ProteinInstanceCullFlags);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(3, "_ProteinInstanceOcclusionFlags", GPUBuffers.Get.ProteinInstanceOcclusionFlags);
+            ComputeShaderManager.Get.ComputeVisibilityCS.Dispatch(3, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
         }
 
         if (cullLipid)
@@ -442,20 +442,20 @@ public static class CutAwayUtils
             GPUBuffers.Get.SphereBatches.ClearAppendBuffer();
 
             //Fill the buffer with occluders
-            ComputeShaderManager.Instance.SphereBatchCS.SetUniform("_NumInstances", SceneManager.Get.NumLipidInstances);
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(3, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(3, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
+            ComputeShaderManager.Get.SphereBatchCS.SetUniform("_NumInstances", SceneManager.Get.NumLipidInstances);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
 
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(3, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
-            ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(3, "_OccludeeSphereBatches", GPUBuffers.Get.SphereBatches);
-            ComputeShaderManager.Instance.SphereBatchCS.Dispatch(3, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_OccludeeSphereBatches", GPUBuffers.Get.SphereBatches);
+            ComputeShaderManager.Get.SphereBatchCS.Dispatch(3, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
 
             // Count occluder instances
             ComputeBuffer.CopyCount(GPUBuffers.Get.SphereBatches, GPUBuffers.Get.ArgBuffer, 0);
 
             // Clear lipid occlusion buffer 
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(0, "_FlagBuffer", GPUBuffers.Get.LipidInstanceOcclusionFlags);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.Dispatch(0, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(0, "_FlagBuffer", GPUBuffers.Get.LipidInstanceOcclusionFlags);
+            ComputeShaderManager.Get.ComputeVisibilityCS.Dispatch(0, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
 
             // Bind the read/write occlusion buffer to the shader
             // After this draw call the occlusion buffer will be filled with ones if an instance occluded and occludee, zero otherwise
@@ -480,19 +480,19 @@ public static class CutAwayUtils
             Graphics.DrawProceduralIndirect(MeshTopology.Points, GPUBuffers.Get.ArgBuffer);
             Graphics.ClearRandomWriteTargets();
 
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetUniform("_CutObjectIndex", cutObjectIndex);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetUniform("_NumIngredients", SceneManager.Get.NumAllIngredients);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(4, "_CutInfo", GPUBuffers.Get.CutInfo);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetUniform("_CutObjectIndex", cutObjectIndex);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetUniform("_NumIngredients", SceneManager.Get.NumAllIngredients);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_CutInfo", GPUBuffers.Get.CutInfo);
 
             //// Discard occluding instances according to value2
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetUniform("_CutObjectId", cutObject.Id);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetUniform("_ConsumeRestoreState", internalState);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(4, "_Histograms", GPUBuffers.Get.Histograms);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(4, "_HistogramsLookup", GPUBuffers.Get.HistogramsLookup);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceOcclusionFlags", GPUBuffers.Get.LipidInstanceOcclusionFlags);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.Dispatch(4, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetUniform("_CutObjectId", cutObject.Id);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetUniform("_ConsumeRestoreState", internalState);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_Histograms", GPUBuffers.Get.Histograms);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_HistogramsLookup", GPUBuffers.Get.HistogramsLookup);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceOcclusionFlags", GPUBuffers.Get.LipidInstanceOcclusionFlags);
+            ComputeShaderManager.Get.ComputeVisibilityCS.Dispatch(4, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
         }
     }
 
@@ -513,26 +513,26 @@ public static class CutAwayUtils
         if (resetCutSnapshot > 0)
         {
             // Discard occluding instances according to value2
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetUniform("_CutObjectId", resetCutSnapshot);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetUniform("_ConsumeRestoreState", 2);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(3, "_Histograms", GPUBuffers.Get.Histograms);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(3, "_HistogramsLookup", GPUBuffers.Get.HistogramsLookup);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(3, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(3, "_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstanceInfo);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(3, "_ProteinInstanceCullFlags", GPUBuffers.Get.ProteinInstanceCullFlags);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(3, "_ProteinInstanceOcclusionFlags", GPUBuffers.Get.ProteinInstanceOcclusionFlags);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.Dispatch(3, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetUniform("_CutObjectId", resetCutSnapshot);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetUniform("_ConsumeRestoreState", 2);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(3, "_Histograms", GPUBuffers.Get.Histograms);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(3, "_HistogramsLookup", GPUBuffers.Get.HistogramsLookup);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(3, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(3, "_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(3, "_ProteinInstanceCullFlags", GPUBuffers.Get.ProteinInstanceCullFlags);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(3, "_ProteinInstanceOcclusionFlags", GPUBuffers.Get.ProteinInstanceOcclusionFlags);
+            ComputeShaderManager.Get.ComputeVisibilityCS.Dispatch(3, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
 
             //// Discard occluding instances according to value2
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetUniform("_CutObjectId", resetCutSnapshot);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetUniform("_ConsumeRestoreState", 2);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(4, "_Histograms", GPUBuffers.Get.Histograms);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(4, "_HistogramsLookup", GPUBuffers.Get.HistogramsLookup);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(4, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceOcclusionFlags", GPUBuffers.Get.LipidInstanceOcclusionFlags);
-            ComputeShaderManager.Instance.ComputeVisibilityCS.Dispatch(4, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetUniform("_CutObjectId", resetCutSnapshot);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetUniform("_ConsumeRestoreState", 2);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_Histograms", GPUBuffers.Get.Histograms);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_HistogramsLookup", GPUBuffers.Get.HistogramsLookup);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceOcclusionFlags", GPUBuffers.Get.LipidInstanceOcclusionFlags);
+            ComputeShaderManager.Get.ComputeVisibilityCS.Dispatch(4, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
         }
 
         var cutObjectId = -1;

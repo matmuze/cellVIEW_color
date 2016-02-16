@@ -13,7 +13,7 @@ public static class RenderUtils
         renderProteinsMaterial.SetVector("_CameraForward", camera.transform.forward);
 
         renderProteinsMaterial.SetBuffer("_LodLevelsInfos", GPUBuffers.Get.LodInfo);
-        renderProteinsMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstanceInfo);
+        renderProteinsMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
         renderProteinsMaterial.SetBuffer("_ProteinInstancePositions", GPUBuffers.Get.ProteinInstancePositions);
         renderProteinsMaterial.SetBuffer("_ProteinInstanceRotations", GPUBuffers.Get.ProteinInstanceRotations);
 
@@ -36,7 +36,7 @@ public static class RenderUtils
         renderProteinsMaterial.SetVector("_CameraForward", camera.transform.forward);
 
         renderProteinsMaterial.SetBuffer("_LodLevelsInfos", GPUBuffers.Get.LodInfo);
-        renderProteinsMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstanceInfo);
+        renderProteinsMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
         renderProteinsMaterial.SetBuffer("_ProteinInstancePositions", GPUBuffers.Get.ProteinInstancePositions);
         renderProteinsMaterial.SetBuffer("_ProteinInstanceRotations", GPUBuffers.Get.ProteinInstanceRotations);
 
@@ -60,7 +60,7 @@ public static class RenderUtils
         renderProteinsMaterial.SetVector("_CameraForward", camera.transform.forward);
 
         renderProteinsMaterial.SetBuffer("_LodLevelsInfos", GPUBuffers.Get.LodInfo);
-        renderProteinsMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstanceInfo);
+        renderProteinsMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
         renderProteinsMaterial.SetBuffer("_ProteinInstancePositions", GPUBuffers.Get.ProteinInstancePositions);
         renderProteinsMaterial.SetBuffer("_ProteinInstanceRotations", GPUBuffers.Get.ProteinInstanceRotations);
 
@@ -95,7 +95,7 @@ public static class RenderUtils
         renderProteinsMaterial.SetVector("_CameraForward", camera.transform.forward);
 
         renderProteinsMaterial.SetBuffer("_LodLevelsInfos", GPUBuffers.Get.LodInfo);
-        renderProteinsMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstanceInfo);
+        renderProteinsMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
         renderProteinsMaterial.SetBuffer("_ProteinInstancePositions", GPUBuffers.Get.ProteinInstancePositions);
         renderProteinsMaterial.SetBuffer("_ProteinInstanceRotations", GPUBuffers.Get.ProteinInstanceRotations);
 
@@ -118,7 +118,7 @@ public static class RenderUtils
     //    renderProteinsMaterial.SetVector("_CameraForward", camera.transform.forward);
 
     //    renderProteinsMaterial.SetBuffer("_LodLevelsInfos", GPUBuffers.Get.LodInfo);
-    //    renderProteinsMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstanceInfo);
+    //    renderProteinsMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
     //    renderProteinsMaterial.SetBuffer("_ProteinInstancePositions", GPUBuffers.Get.ProteinInstancePositions);
     //    renderProteinsMaterial.SetBuffer("_ProteinInstanceRotations", GPUBuffers.Get.ProteinInstanceRotations);
 
@@ -140,28 +140,28 @@ public static class RenderUtils
         // Always clear append buffer before usage
         GPUBuffers.Get.SphereBatches.ClearAppendBuffer();
 
-        ComputeShaderManager.Instance.SphereBatchCS.SetFloat("_Scale", GlobalProperties.Get.Scale);
-        ComputeShaderManager.Instance.SphereBatchCS.SetInt("_NumLevels", SceneManager.Get.NumLodLevels);
-        ComputeShaderManager.Instance.SphereBatchCS.SetInt("_NumInstances", SceneManager.Get.NumProteinInstances);
-        ComputeShaderManager.Instance.SphereBatchCS.SetInt("_EnableLod", Convert.ToInt32(GlobalProperties.Get.EnableLod));
-        ComputeShaderManager.Instance.SphereBatchCS.SetVector("_CameraForward", camera.transform.forward);
-        ComputeShaderManager.Instance.SphereBatchCS.SetVector("_CameraPosition", camera.transform.position);
-        ComputeShaderManager.Instance.SphereBatchCS.SetFloats("_FrustrumPlanes", MyUtility.FrustrumPlanesAsFloats(camera));
+        ComputeShaderManager.Get.SphereBatchCS.SetFloat("_Scale", GlobalProperties.Get.Scale);
+        ComputeShaderManager.Get.SphereBatchCS.SetInt("_NumLevels", SceneManager.Get.NumLodLevels);
+        ComputeShaderManager.Get.SphereBatchCS.SetInt("_NumInstances", SceneManager.Get.NumProteinInstances);
+        ComputeShaderManager.Get.SphereBatchCS.SetInt("_EnableLod", Convert.ToInt32(GlobalProperties.Get.EnableLod));
+        ComputeShaderManager.Get.SphereBatchCS.SetVector("_CameraForward", camera.transform.forward);
+        ComputeShaderManager.Get.SphereBatchCS.SetVector("_CameraPosition", camera.transform.position);
+        ComputeShaderManager.Get.SphereBatchCS.SetFloats("_FrustrumPlanes", MyUtility.FrustrumPlanesAsFloats(camera));
 
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(0, "_ProteinRadii", GPUBuffers.Get.ProteinRadii);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(0, "_ProteinAtomCount", GPUBuffers.Get.ProteinAtomCount);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(0, "_ProteinAtomStart", GPUBuffers.Get.ProteinAtomStart);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(0, "_ProteinClusterCount", GPUBuffers.Get.ProteinAtomClusterCount);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(0, "_ProteinClusterStart", GPUBuffers.Get.ProteinAtomClusterStart);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(0, "_LodLevelsInfos", GPUBuffers.Get.LodInfo);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(0, "_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstanceInfo);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(0, "_ProteinInstancePositions", GPUBuffers.Get.ProteinInstancePositions);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(0, "_ProteinInstanceCullFlags", GPUBuffers.Get.ProteinInstanceCullFlags);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(0, "_ProteinInstanceVisibilityFlags", GPUBuffers.Get.ProteinInstanceVisibilityFlags);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(0, "_ProteinInstanceOcclusionFlags", GPUBuffers.Get.ProteinInstanceOcclusionFlags);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(0, "_ProteinSphereBatchInfos", GPUBuffers.Get.SphereBatches);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(0, "_ProteinRadii", GPUBuffers.Get.ProteinRadii);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(0, "_ProteinAtomCount", GPUBuffers.Get.ProteinAtomCount);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(0, "_ProteinAtomStart", GPUBuffers.Get.ProteinAtomStart);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(0, "_ProteinClusterCount", GPUBuffers.Get.ProteinAtomClusterCount);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(0, "_ProteinClusterStart", GPUBuffers.Get.ProteinAtomClusterStart);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(0, "_LodLevelsInfos", GPUBuffers.Get.LodInfo);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(0, "_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(0, "_ProteinInstancePositions", GPUBuffers.Get.ProteinInstancePositions);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(0, "_ProteinInstanceCullFlags", GPUBuffers.Get.ProteinInstanceCullFlags);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(0, "_ProteinInstanceVisibilityFlags", GPUBuffers.Get.ProteinInstanceVisibilityFlags);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(0, "_ProteinInstanceOcclusionFlags", GPUBuffers.Get.ProteinInstanceOcclusionFlags);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(0, "_ProteinSphereBatchInfos", GPUBuffers.Get.SphereBatches);
 
-        ComputeShaderManager.Instance.SphereBatchCS.Dispatch(0, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
+        ComputeShaderManager.Get.SphereBatchCS.Dispatch(0, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
         ComputeBuffer.CopyCount(GPUBuffers.Get.SphereBatches, GPUBuffers.Get.ArgBuffer, 0);
     }
 
@@ -172,28 +172,28 @@ public static class RenderUtils
         // Always clear append buffer before usage
         GPUBuffers.Get.SphereBatches.ClearAppendBuffer();
 
-        ComputeShaderManager.Instance.SphereBatchCS.SetFloat("_Scale", GlobalProperties.Get.Scale);
-        ComputeShaderManager.Instance.SphereBatchCS.SetInt("_NumLevels", SceneManager.Get.NumLodLevels);
-        ComputeShaderManager.Instance.SphereBatchCS.SetInt("_NumInstances", SceneManager.Get.NumProteinInstances);
-        ComputeShaderManager.Instance.SphereBatchCS.SetInt("_EnableLod", Convert.ToInt32(GlobalProperties.Get.EnableLod));
-        ComputeShaderManager.Instance.SphereBatchCS.SetVector("_CameraForward", camera.transform.forward);
-        ComputeShaderManager.Instance.SphereBatchCS.SetVector("_CameraPosition", camera.transform.position);
-        ComputeShaderManager.Instance.SphereBatchCS.SetFloats("_FrustrumPlanes", MyUtility.FrustrumPlanesAsFloats(camera));
+        ComputeShaderManager.Get.SphereBatchCS.SetFloat("_Scale", GlobalProperties.Get.Scale);
+        ComputeShaderManager.Get.SphereBatchCS.SetInt("_NumLevels", SceneManager.Get.NumLodLevels);
+        ComputeShaderManager.Get.SphereBatchCS.SetInt("_NumInstances", SceneManager.Get.NumProteinInstances);
+        ComputeShaderManager.Get.SphereBatchCS.SetInt("_EnableLod", Convert.ToInt32(GlobalProperties.Get.EnableLod));
+        ComputeShaderManager.Get.SphereBatchCS.SetVector("_CameraForward", camera.transform.forward);
+        ComputeShaderManager.Get.SphereBatchCS.SetVector("_CameraPosition", camera.transform.position);
+        ComputeShaderManager.Get.SphereBatchCS.SetFloats("_FrustrumPlanes", MyUtility.FrustrumPlanesAsFloats(camera));
 
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(4, "_ProteinRadii", GPUBuffers.Get.ProteinRadii);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(4, "_ProteinAtomCount", GPUBuffers.Get.ProteinAtomCount);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(4, "_ProteinAtomStart", GPUBuffers.Get.ProteinAtomStart);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(4, "_ProteinClusterCount", GPUBuffers.Get.ProteinAtomClusterCount);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(4, "_ProteinClusterStart", GPUBuffers.Get.ProteinAtomClusterStart);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(4, "_LodLevelsInfos", GPUBuffers.Get.LodInfo);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(4, "_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstanceInfo);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(4, "_ProteinInstancePositions", GPUBuffers.Get.ProteinInstancePositions);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(4, "_ProteinInstanceCullFlags", GPUBuffers.Get.ProteinInstanceCullFlags);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(4, "_ProteinInstanceVisibilityFlags", GPUBuffers.Get.ProteinInstanceVisibilityFlags);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(4, "_ProteinInstanceOcclusionFlags", GPUBuffers.Get.ProteinInstanceOcclusionFlags);
-        ComputeShaderManager.Instance.SphereBatchCS.SetBuffer(4, "_ProteinSphereBatchInfos", GPUBuffers.Get.SphereBatches);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(4, "_ProteinRadii", GPUBuffers.Get.ProteinRadii);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(4, "_ProteinAtomCount", GPUBuffers.Get.ProteinAtomCount);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(4, "_ProteinAtomStart", GPUBuffers.Get.ProteinAtomStart);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(4, "_ProteinClusterCount", GPUBuffers.Get.ProteinAtomClusterCount);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(4, "_ProteinClusterStart", GPUBuffers.Get.ProteinAtomClusterStart);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(4, "_LodLevelsInfos", GPUBuffers.Get.LodInfo);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(4, "_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(4, "_ProteinInstancePositions", GPUBuffers.Get.ProteinInstancePositions);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(4, "_ProteinInstanceCullFlags", GPUBuffers.Get.ProteinInstanceCullFlags);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(4, "_ProteinInstanceVisibilityFlags", GPUBuffers.Get.ProteinInstanceVisibilityFlags);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(4, "_ProteinInstanceOcclusionFlags", GPUBuffers.Get.ProteinInstanceOcclusionFlags);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(4, "_ProteinSphereBatchInfos", GPUBuffers.Get.SphereBatches);
 
-        ComputeShaderManager.Instance.SphereBatchCS.Dispatch(4, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
+        ComputeShaderManager.Get.SphereBatchCS.Dispatch(4, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
         ComputeBuffer.CopyCount(GPUBuffers.Get.SphereBatches, GPUBuffers.Get.ArgBuffer, 0);
     }
 }

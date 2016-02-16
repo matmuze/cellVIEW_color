@@ -7,7 +7,7 @@ public class KMeansClustering
 {
     public static List<Vector4> GetClusters(List<Vector4> atoms, int numCentroids)
     {
-        if (ComputeShaderManager.Instance.KMeansCS == null) throw new Exception("KMeans compute shader not assigned");
+        if (ComputeShaderManager.Get.KMeansCS == null) throw new Exception("KMeans compute shader not assigned");
 
         if (numCentroids <= 0) throw new Exception("Num centroids too low");
 
@@ -33,20 +33,20 @@ public class KMeansClustering
 
         var membershipBuffer = new ComputeBuffer(atoms.Count, sizeof(int));
         
-        ComputeShaderManager.Instance.KMeansCS.SetInt("_NumPoints", atoms.Count);
-        ComputeShaderManager.Instance.KMeansCS.SetInt("_NumCentroids", numCentroids);
+        ComputeShaderManager.Get.KMeansCS.SetInt("_NumPoints", atoms.Count);
+        ComputeShaderManager.Get.KMeansCS.SetInt("_NumCentroids", numCentroids);
 
         for (int i = 0; i < 5; i++)
         {
-            ComputeShaderManager.Instance.KMeansCS.SetBuffer(0, "_PointBuffer", pointBuffer);
-            ComputeShaderManager.Instance.KMeansCS.SetBuffer(0, "_CentroidBuffer", centroidBuffer);
-            ComputeShaderManager.Instance.KMeansCS.SetBuffer(0, "_MembershipBuffer", membershipBuffer);
-            ComputeShaderManager.Instance.KMeansCS.Dispatch(0, Mathf.CeilToInt(atoms.Count / 64.0f), 1, 1);
+            ComputeShaderManager.Get.KMeansCS.SetBuffer(0, "_PointBuffer", pointBuffer);
+            ComputeShaderManager.Get.KMeansCS.SetBuffer(0, "_CentroidBuffer", centroidBuffer);
+            ComputeShaderManager.Get.KMeansCS.SetBuffer(0, "_MembershipBuffer", membershipBuffer);
+            ComputeShaderManager.Get.KMeansCS.Dispatch(0, Mathf.CeilToInt(atoms.Count / 64.0f), 1, 1);
             
-            ComputeShaderManager.Instance.KMeansCS.SetBuffer(1, "_PointBuffer", pointBuffer);
-            ComputeShaderManager.Instance.KMeansCS.SetBuffer(1, "_NewCentroidBuffer", centroidBuffer);
-            ComputeShaderManager.Instance.KMeansCS.SetBuffer(1, "_NewMembershipBuffer", membershipBuffer);
-            ComputeShaderManager.Instance.KMeansCS.Dispatch(1, Mathf.CeilToInt(numCentroids / 64.0f), 1, 1);
+            ComputeShaderManager.Get.KMeansCS.SetBuffer(1, "_PointBuffer", pointBuffer);
+            ComputeShaderManager.Get.KMeansCS.SetBuffer(1, "_NewCentroidBuffer", centroidBuffer);
+            ComputeShaderManager.Get.KMeansCS.SetBuffer(1, "_NewMembershipBuffer", membershipBuffer);
+            ComputeShaderManager.Get.KMeansCS.Dispatch(1, Mathf.CeilToInt(numCentroids / 64.0f), 1, 1);
         }
 
         var newCentroids = new Vector4[numCentroids];

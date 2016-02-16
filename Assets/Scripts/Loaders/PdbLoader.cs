@@ -334,6 +334,30 @@ public static class AtomHelper
 		new Color32(255, 0,255, 255)         // A        purple   
     };
 
+// DavidGoodsell = { 'N':(0.7,0.7,1.), 'C':(1.,1.,1.), 'O':(1.0,.7,.7),
+//'H':(1.,1.,1.), 'HN':(0.7,0.7,1.0), 
+//'S':(0.9,0.85,0.1), 'ASPOD1':(1.,0.2,0.2),
+//'ASPOD2':(1.,0.2,0.2), 'GLUOE1':(1.,0.2,0.2),
+//'GLUOE2':(1.,0.2,0.2), 'SERHG':(1.0,.7,.7),
+//'THRHG1':(1.0,.7,.7), 'TYROH':(1.0,.7,.7),
+//'TYRHH':(1.0,.7,.7), 'LYSNZ':(0.2,0.3,1.0), 
+//'LYSHZ1':(0.2,0.3,1.0), 'LYSHZ2':(0.2,0.3,1.0), 
+//'LYSHZ3':(0.2,0.3,1.0), 'ARGNE':(0.2,0.3,1.0),
+//'ARGNH1':(0.2,0.3,1.0), 'ARGNH2':(0.2,0.3,1.0),
+//'ARGHH11':(0.2,0.3,1.0), 'ARGHH12':(0.2,0.3,1.0), 
+//'ARGHH21':(0.2,0.3,1.0), 'ARGHH22':(0.2,0.3,1.0), 
+//'ARGHE':(0.2,0.3,1.0), 
+//'GLNHE21':(0.7,0.7,1.0), 'GLNHE22':(0.7,0.7,1.0),
+//'ASNHD21':(0.7,0.7,1.0), 'ASNHD22':(0.7,0.7,1.0),
+//'HISHD1':(0.7,0.7,1.0), 'HISHE2':(0.7,0.7,1.0),
+//'GLNHE2':(0.7,0.7,1.0),'ASNHD2':(0.7,0.7,1.0),
+//'CYSHG':(0.9,0.85,0.1), 'HH':(1.,1.,1.) }
+//DavidGoodsellSortedKeys = [
+//'C', 'HN', 'HH', 'H', 'O', 'SERHG', 'TYROH', 'TYRHH', 'THRHG1',
+//'N', 'ASNHD21', 'ASNHD22', 'GLNHE21', 'GLNHE22', 'GLNHE2', 'ASNHD2',
+//'HISHE2', 'HISHD1', 'S', 'CYSHG', 'GLUOE1', 'GLUOE2', 'ASPOD1',
+//'ASPOD2', 'LYSNZ', 'LYSHZ1', 'LYSHZ2','LYSHZ3','ARGNE', 'ARGNH1', 'ARGNH2',
+//'ARGHH11','ARGHH12','ARGHH21','ARGHH22','ARGHE',]
 
     public static string[] ResidueNames = { "ALA", "ARG", "ASN", "ASP", "CYS", "GLN", "GLU", "GLY", "HID", "HIE", "HIP", "HIS", "ILE", "LEU", "LYS", "MET", "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL" };
     

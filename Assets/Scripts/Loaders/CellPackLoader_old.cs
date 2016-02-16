@@ -148,12 +148,12 @@
 //            }
 //            else
 //            {
-//                AddProteinIngredient(recipeDictionary[j], pathElements);
+//                AddProteinIngredientToCPUBuffer(recipeDictionary[j], pathElements);
 //            }
 //        }
 //	}
 
-//    public static void AddProteinIngredient(JSONNode ingredientDictionary, params string[] pathElements)
+//    public static void AddProteinIngredientToCPUBuffer(JSONNode ingredientDictionary, params string[] pathElements)
 //    {
 //        var name = ingredientDictionary["name"];
 //        var path = MyUtility.GetUrlPath(pathElements.ToList(), name);
@@ -248,7 +248,7 @@
 //        }
         
 //        var color = new Color(UnityEngine.Random.Range(0f,1f), UnityEngine.Random.Range(0f, 1f), UnityEngine.Random.Range(0f, 1f));
-//        SceneManager.Get.AddProteinIngredient(path, atomSet, color, lodProxies);
+//        SceneManager.Get.AddProteinIngredientToCPUBuffer(path, atomSet, color, lodProxies);
 
 //        for (int k = 0; k < ingredientDictionary["results"].Count; k++)
 //        {

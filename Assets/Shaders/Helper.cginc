@@ -1,5 +1,45 @@
  //--------------------------------------------------------------------------------------
 
+struct AtomInfo
+{
+	float atomIndex;
+	float atomSymbolId;
+	float residueSymbolId;
+	float chainSymbolId;
+};
+
+struct ProteinInstanceInfo
+{
+	float proteinIngredientType;
+	float state;
+	float z;
+	float w;
+};
+
+struct ProteinIngredientInfo
+{
+	float proteinIngredientGroupId;
+	float numChains;
+	float chainColorStartIndex;
+	float w;
+};
+
+struct IngredientGroupColorInfo
+{
+	int numProteinInstances;
+	int numProteinInstancesVisible;
+	int screenCoverage;
+	int w;
+};
+
+struct ProteinIngredientColorInfo
+{
+	float numProteinInstances;
+	int numProteinInstancesVisible;
+	int screenCoverage;
+	int w;
+};
+
  // Cutaways
 struct CutInfoStruct
 {

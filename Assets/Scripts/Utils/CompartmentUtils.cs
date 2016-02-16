@@ -252,6 +252,8 @@ namespace Assets.Scripts.Loaders
     [Serializable]
     public class IngredientGroup
     {
+        public int NumIngredients;
+
         public bool _fiber;
         public string _name;
         public string _path;
