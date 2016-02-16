@@ -181,6 +181,9 @@ public static class PdbLoader
                     symbolId = Array.IndexOf(AtomHelper.AtomSymbols, symbol);
                 }
 
+                // Skip hydrogen atoms 
+                if(symbolId == 1) continue;
+
                 var radius = AtomHelper.AtomRadii[symbolId];
 
                 var residueName = line.Substring(17, 3).Trim();
