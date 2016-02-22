@@ -95,7 +95,8 @@ namespace Loaders
             }
 
             // If the set is empty return
-            if (atoms.Count == 0) throw new Exception("Atom list empty: " + name);
+            if (atoms.Count == 0)
+                throw new Exception("Atom list empty: " + name);
 
             return atoms; 
         }

@@ -146,8 +146,7 @@ public static class PdbLoader
 
         foreach (var line in File.ReadAllLines(path))
         {
-            //if (line.StartsWith("ATOM"))// || line.StartsWith("HETATM"))
-            if (line.StartsWith("ATOM") || line.StartsWith("HETATM"))
+            if (line.StartsWith("ATOM") || (pdbName.Contains("3irl") && line.StartsWith("HETATM")))
             {
                 var x = float.Parse(line.Substring(30, 8));
                 var y = float.Parse(line.Substring(38, 8));

@@ -434,7 +434,7 @@ public class CutObject : MonoBehaviour
         }
 
         //SetHidden(Hidden);
-        if (CutObjectAlpha == 0) SetHidden(true);
+        //if (CutObjectAlpha == 0) SetHidden(true);
 
         GetComponent<MeshRenderer>().sharedMaterial.SetFloat("_CutObjectAlpha", CutObjectAlphaStatic);
     }
@@ -457,6 +457,9 @@ public class CutObject : MonoBehaviour
         {
             CutObjectManager.Get.CutObjects.Add(this);
         }
+
+        Hidden = true;
+        previousHiddenValue = !Hidden;
 
         SetMesh();
         
