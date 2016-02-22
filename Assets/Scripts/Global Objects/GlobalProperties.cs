@@ -28,7 +28,9 @@ public class GlobalProperties : MonoBehaviour
 
     public string LastSceneLoaded;
     public string LastRecipeFileLoaded;
+    public string LastMembraneFileLoaded;
     public string LastPositionsFileLoaded;
+    public string LastColorPaletteLoaded;
     
     // Base settings
     public float Scale = 0.065f;

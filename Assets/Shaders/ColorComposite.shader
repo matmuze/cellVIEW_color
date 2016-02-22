@@ -154,11 +154,12 @@
 		return float3(angle, chroma, lum);
 	}
 	
-	
+	StructuredBuffer<ProteinIngredientInfo> _IngredientsInfo;
 
 	StructuredBuffer<AtomInfo> _ProteinAtomInfos;
 	StructuredBuffer<ProteinInstanceInfo> _ProteinInstanceInfo;
-	StructuredBuffer<ProteinIngredientInfo> _ProteinIngredientProperties;
+		
+	StructuredBuffer<LipidInstanceInfo> _LipidInstancesInfo;		
 
 	StructuredBuffer<IngredientGroupColorInfo> _IngredientGroupsColorInfo;
 	StructuredBuffer<ProteinIngredientColorInfo> _ProteinIngredientsColorInfo;
@@ -167,8 +168,8 @@
 
 	StructuredBuffer<float4> _AtomColors;
 	StructuredBuffer<float4> _AminoAcidColors;
-	StructuredBuffer<float4> _ProteinIngredientsColors;
-	StructuredBuffer<float4> _ProteinIngredientsChainColors;
+	StructuredBuffer<float4> _IngredientsColors;
+	StructuredBuffer<float4> _IngredientsChainColors;
 	StructuredBuffer<float4> _IngredientGroupsColor;
 
 	//*****//
@@ -236,12 +237,21 @@
 			int lengthTotalSegment = endRange - beginRange; 
 			lerpFactor =  (float)lengthCurrentEyePosSegment / (float)lengthTotalSegment;
 		}		
+		
+		if (instanceId >= 100000)
+		{
+			int lipidInstanceId = instanceId - 100000;
+			LipidInstanceInfo lipidInstanceInfo = _LipidInstancesInfo[lipidInstanceId];
+			float4 lipidIngredientColor = _IngredientsColors[lipidInstanceInfo.lipidIngredientType];
 
-		if (instanceId >= 0)
+			color = lipidIngredientColor;
+			return;
+		}
+		else if (instanceId >= 0)
 		{
 			AtomInfo atomInfo = _ProteinAtomInfos[atomId];
 			ProteinInstanceInfo proteinInstanceInfo = _ProteinInstanceInfo[instanceId];
-			ProteinIngredientInfo proteinIngredientInfo = _ProteinIngredientProperties[proteinInstanceInfo.proteinIngredientType];
+			ProteinIngredientInfo proteinIngredientInfo = _IngredientsInfo[proteinInstanceInfo.proteinIngredientType];
 
 			IngredientGroupColorInfo ingredientGroupColorInfo = _IngredientGroupsColorInfo[proteinIngredientInfo.proteinIngredientGroupId];
 			ProteinIngredientColorInfo proteinIngredientColorInfo = _ProteinIngredientsColorInfo[proteinInstanceInfo.proteinIngredientType];
@@ -249,41 +259,39 @@
 			// To debug color infos
 			//if(_ProteinIngredientsColorInfo[proteinInstanceInfo.proteinIngredientType].numProteinInstances <  1000) discard;	
 			//if((float)proteinIngredientColorInfo.screenCoverage / (float)_NumPixels < 0.25) discard;
-			//if(proteinIngredientColorInfo.numProteinInstancesVisible < 3000) discard;
-					
+			//if(proteinIngredientColorInfo.numProteinInstancesVisible < 3000) discard;					
 
 			// Predefined colors
 			float4 atomColor = _AtomColors[atomInfo.atomSymbolId];
 			float4 aminoAcidColor = _AminoAcidColors[atomInfo.residueSymbolId];
-			float4 proteinIngredientsChainColors = _ProteinIngredientsChainColors[proteinIngredientInfo.chainColorStartIndex + atomInfo.chainSymbolId];
-			float4 proteinIngredientsColors = _ProteinIngredientsColors[proteinInstanceInfo.proteinIngredientType];
+			float4 proteinIngredientsChainColor = _IngredientsChainColors[proteinIngredientInfo.chainColorStartIndex + atomInfo.chainSymbolId];
+			float4 proteinIngredientsColor = _IngredientsColors[proteinInstanceInfo.proteinIngredientType];
 			float4 ingredientGroupColor = _IngredientGroupsColor[proteinIngredientInfo.proteinIngredientGroupId];
 			
-			float4 atomChainCarbonColor = (atomInfo.atomSymbolId == 0) ? proteinIngredientsChainColors : proteinIngredientsChainColors * (1- 0.25);
+			// Goodsell coloring
+			float4 goodsellColor = (atomInfo.atomSymbolId == 0) ? proteinIngredientsChainColor : proteinIngredientsChainColor * (1- 0.25);
 			
-			//int level = 1;
-			//float lerpFactor = _LevelLerpFactor;
+			color = proteinIngredientsColor;
+			return;
+
 
 			float4 beginColor = float4(0,0,0,0);
 			float4 endColor = float4(0,0,0,0);
 
 			beginColor = (level == 0) ? atomColor : beginColor;
-			endColor = (level == 0) ? atomChainCarbonColor : endColor;
+			endColor = (level == 0) ? goodsellColor : endColor;
 
-			beginColor = (level == 1) ? atomChainCarbonColor : beginColor;
-			endColor = (level == 1) ? proteinIngredientsChainColors : endColor;
+			beginColor = (level == 1) ? goodsellColor : beginColor;
+			endColor = (level == 1) ? proteinIngredientsChainColor : endColor;
 
-			beginColor = (level == 2) ? proteinIngredientsChainColors : beginColor;
-			endColor = (level == 2) ? proteinIngredientsColors : endColor;
+			beginColor = (level == 2) ? proteinIngredientsChainColor : beginColor;
+			endColor = (level == 2) ? proteinIngredientsColor : endColor;
 			
-			beginColor = (level == 3) ? proteinIngredientsColors : beginColor;
+			beginColor = (level == 3) ? proteinIngredientsColor : beginColor;
 			endColor = (level == 3) ? ingredientGroupColor : endColor;
 
 			beginColor = (level == 4) ? ingredientGroupColor : beginColor;
 			endColor = (level == 4) ? ingredientGroupColor : endColor;
-
-			//beginColor = (level == 3) ? aminoAcidColor : beginColor;
-			//endColor = (level == 3) ? atomColor : endColor;
 			
 			color = lerp(beginColor, endColor, lerpFactor);
 
@@ -302,16 +310,16 @@
 
 			////*******//
 			//test compartment color
-			float h = proteinIngredientsColors.x;
-			float c = proteinIngredientsColors.y;
-			float l = proteinIngredientsChainColors.z;
+			float h = proteinIngredientsColor.x;
+			float c = proteinIngredientsColor.y;
+			float l = proteinIngredientsChainColor.z;
 
 			float4 luminances;
 			luminances[0] = ingredientGroupColor.z;
-			luminances[1] = proteinIngredientsColors.z;
-			luminances[2] = proteinIngredientsChainColors.z;
+			luminances[1] = proteinIngredientsColor.z;
+			luminances[2] = proteinIngredientsChainColor.z;
 			luminances[3] = 70;
-			float4x2 HCs = float4x2(ingredientGroupColor.xy, proteinIngredientsColors.xy, proteinIngredientsChainColors.xy, atomColor.xy);
+			float4x2 HCs = float4x2(ingredientGroupColor.xy, proteinIngredientsColor.xy, proteinIngredientsChainColor.xy, atomColor.xy);
 			
 			//tbd, temporary replacement because atomcolor is rgb
 			HCs[3][0] = 100;

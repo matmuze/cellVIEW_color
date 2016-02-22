@@ -16,6 +16,14 @@ struct ProteinInstanceInfo
 	float w;
 };
 
+struct LipidInstanceInfo
+{
+	float lipidIngredientType;
+	float state;
+	float z;
+	float w;
+};
+
 struct ProteinIngredientInfo
 {
 	float proteinIngredientGroupId;
@@ -24,9 +32,11 @@ struct ProteinIngredientInfo
 	float w;
 };
 
+
+
 struct IngredientGroupColorInfo
 {
-	int numProteinInstances;
+	float numProteinInstances;
 	int numProteinInstancesVisible;
 	int screenCoverage;
 	int w;

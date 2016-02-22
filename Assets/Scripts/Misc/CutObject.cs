@@ -426,7 +426,14 @@ public class CutObject : MonoBehaviour
             PreviousCutType = CutType;
         }
 
-        SetHidden(Hidden);
+        if (previousHiddenValue != Hidden)
+        {
+            SetHidden(Hidden);
+            previousHiddenValue = Hidden;
+
+        }
+
+        //SetHidden(Hidden);
         if (CutObjectAlpha == 0) SetHidden(true);
 
         GetComponent<MeshRenderer>().sharedMaterial.SetFloat("_CutObjectAlpha", CutObjectAlphaStatic);
@@ -494,7 +501,7 @@ public class CutObject : MonoBehaviour
                 gameObject.AddComponent<BoxCollider>();
                 gameObject.GetComponent<MeshRenderer>().enabled = true;
                 gameObject.GetComponent<TransformHandle>().enabled = true;
-                gameObject.transform.localScale = new Vector3(10,10,10);
+                //gameObject.transform.localScale = new Vector3(10,10,10);
                 break;
 
             case CutType.Sphere:
@@ -503,7 +510,7 @@ public class CutObject : MonoBehaviour
                 gameObject.AddComponent<SphereCollider>();
                 gameObject.GetComponent<MeshRenderer>().enabled = true;
                 gameObject.GetComponent<TransformHandle>().enabled = true;
-                gameObject.transform.localScale = new Vector3(50, 50, 50);
+                //gameObject.transform.localScale = new Vector3(50, 50, 50);
                 break;
 
             case CutType.Cube:
@@ -512,7 +519,7 @@ public class CutObject : MonoBehaviour
                 gameObject.AddComponent<MeshCollider>();
                 gameObject.GetComponent<MeshRenderer>().enabled = true;
                 gameObject.GetComponent<TransformHandle>().enabled = true;
-                gameObject.transform.localScale = new Vector3(50, 50, 50);
+                //gameObject.transform.localScale = new Vector3(50, 50, 50);
                 break;
 
             case CutType.Cone:

@@ -118,7 +118,7 @@ public class SSAOPro_StartupWindow : EditorWindow
 
 		string versionColor = EditorGUIUtility.isProSkin ? "#ffffffee" : "#000000ee";
 		changelogText = LoadAssetAt<TextAsset>(pathChangelog).text;
-		changelogText = Regex.Replace(changelogText, @"^[0-9].*", "<color=" + versionColor + "><size=13><b>Version $0</b></size></color>", RegexOptions.Multiline);
+		changelogText = Regex.Replace(changelogText, @"^[0-9].*", "<color=" + versionColor + "><size=13><foldouts>Version $0</foldouts></size></color>", RegexOptions.Multiline);
 		changelogText = Regex.Replace(changelogText, @"^- (\w+:)", "  <color=" + versionColor + ">$0</color>", RegexOptions.Multiline);
 
 		headerPic = LoadAssetAt<Texture2D>(pathImages + "header.jpg");
@@ -155,10 +155,10 @@ public class SSAOPro_StartupWindow : EditorWindow
 			// Doc
 			GUILayout.BeginHorizontal();
 			{
-				if (GUILayout.Button("<b>Documentation</b>\n<size=9>Complete manual, examples, tips & tricks</size>", richButtonStyle, GUILayout.MaxWidth(260), GUILayout.Height(36)))
+				if (GUILayout.Button("<foldouts>Documentation</foldouts>\n<size=9>Complete manual, examples, tips & tricks</size>", richButtonStyle, GUILayout.MaxWidth(260), GUILayout.Height(36)))
 					Application.OpenURL("http://thomashourdel.com/ssaopro/doc/");
 
-				if (GUILayout.Button("<b>Rate it</b>\n<size=9>Leave a review on the Asset Store</size>", richButtonStyle, GUILayout.Height(36)))
+				if (GUILayout.Button("<foldouts>Rate it</foldouts>\n<size=9>Leave a review on the Asset Store</size>", richButtonStyle, GUILayout.Height(36)))
 					Application.OpenURL("com.unity3d.kharma:content/22369");
 			}
 			GUILayout.EndHorizontal();
@@ -168,13 +168,13 @@ public class SSAOPro_StartupWindow : EditorWindow
 
 			GUILayout.BeginHorizontal();
 			{
-				if (GUILayout.Button("<b>E-mail</b>\n<size=9>thomas@hourdel.com</size>", richButtonStyle, GUILayout.MaxWidth(172), GUILayout.Height(36)))
+				if (GUILayout.Button("<foldouts>E-mail</foldouts>\n<size=9>thomas@hourdel.com</size>", richButtonStyle, GUILayout.MaxWidth(172), GUILayout.Height(36)))
 					Application.OpenURL("mailto:thomas@hourdel.com");
 
-				if (GUILayout.Button("<b>Twitter</b>\n<size=9>@Chman</size>", richButtonStyle, GUILayout.Height(36)))
+				if (GUILayout.Button("<foldouts>Twitter</foldouts>\n<size=9>@Chman</size>", richButtonStyle, GUILayout.Height(36)))
 					Application.OpenURL("http://twitter.com/Chman");
 
-				if (GUILayout.Button("<b>Support Forum</b>\n<size=9>Unity Community</size>", richButtonStyle, GUILayout.MaxWidth(172), GUILayout.Height(36)))
+				if (GUILayout.Button("<foldouts>Support Forum</foldouts>\n<size=9>Unity Community</size>", richButtonStyle, GUILayout.MaxWidth(172), GUILayout.Height(36)))
 					Application.OpenURL("http://forum.unity3d.com/threads/ssao-pro-high-quality-screen-space-ambient-occlusion.274003/");
 			}
 			GUILayout.EndHorizontal();

@@ -116,7 +116,7 @@ public static class CutAwayUtils
         ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetUniform("_Scale", GlobalProperties.Get.Scale);
         ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetUniform("_TypeId", SceneManager.Get.NumProteinInstances);
         ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetUniform("_NumInstances", SceneManager.Get.NumLipidInstances);
-        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(1, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(1, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstancesInfo);
         ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(1, "_LipidInstancePositions", GPUBuffers.Get.LipidInstancePositions);
         ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(1, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
         ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(1, "_LipidInstanceVisibilityFlags", GPUBuffers.Get.LipidInstanceVisibilityFlags);
@@ -275,7 +275,7 @@ public static class CutAwayUtils
 
             //Fill the buffer with occludees
             ComputeShaderManager.Get.SphereBatchCS.SetUniform("_NumInstances", SceneManager.Get.NumLipidInstances);
-            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstancesInfo);
             ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
 
             ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
@@ -289,7 +289,7 @@ public static class CutAwayUtils
 
             // Prepare draw call
             OcclusionQueriesMaterial.SetFloat("_Scale", GlobalProperties.Get.Scale);
-            OcclusionQueriesMaterial.SetBuffer("_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
+            OcclusionQueriesMaterial.SetBuffer("_LipidInstanceInfo", GPUBuffers.Get.LipidInstancesInfo);
             OcclusionQueriesMaterial.SetBuffer("_LipidInstancePositions", GPUBuffers.Get.LipidInstancePositions);
             OcclusionQueriesMaterial.SetBuffer("_OccludeeSphereBatches", GPUBuffers.Get.SphereBatches);
             OcclusionQueriesMaterial.SetPass(2);
@@ -347,7 +347,7 @@ public static class CutAwayUtils
 
             //Fill the buffer with occludees
             ComputeShaderManager.Get.SphereBatchCS.SetUniform("_NumInstances", SceneManager.Get.NumLipidInstances);
-            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstancesInfo);
             ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
 
             ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
@@ -361,7 +361,7 @@ public static class CutAwayUtils
 
             // Prepare draw call
             OcclusionQueriesMaterial.SetFloat("_Scale", GlobalProperties.Get.Scale);
-            OcclusionQueriesMaterial.SetBuffer("_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
+            OcclusionQueriesMaterial.SetBuffer("_LipidInstanceInfo", GPUBuffers.Get.LipidInstancesInfo);
             OcclusionQueriesMaterial.SetBuffer("_LipidInstancePositions", GPUBuffers.Get.LipidInstancePositions);
             OcclusionQueriesMaterial.SetBuffer("_OccludeeSphereBatches", GPUBuffers.Get.SphereBatches);
             OcclusionQueriesMaterial.SetPass(5);
@@ -443,7 +443,7 @@ public static class CutAwayUtils
 
             //Fill the buffer with occluders
             ComputeShaderManager.Get.SphereBatchCS.SetUniform("_NumInstances", SceneManager.Get.NumLipidInstances);
-            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
+            ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstancesInfo);
             ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
 
             ComputeShaderManager.Get.SphereBatchCS.SetBuffer(3, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
@@ -471,7 +471,7 @@ public static class CutAwayUtils
             OcclusionQueriesMaterial.SetTexture("_DistanceField", _floodFillTexturePong);
 
             OcclusionQueriesMaterial.SetFloat("_Scale", GlobalProperties.Get.Scale);
-            OcclusionQueriesMaterial.SetBuffer("_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
+            OcclusionQueriesMaterial.SetBuffer("_LipidInstanceInfo", GPUBuffers.Get.LipidInstancesInfo);
             OcclusionQueriesMaterial.SetBuffer("_LipidInstancePositions", GPUBuffers.Get.LipidInstancePositions);
             OcclusionQueriesMaterial.SetBuffer("_OccludeeSphereBatches", GPUBuffers.Get.SphereBatches);
             OcclusionQueriesMaterial.SetPass(3);
@@ -489,7 +489,7 @@ public static class CutAwayUtils
             ComputeShaderManager.Get.ComputeVisibilityCS.SetUniform("_ConsumeRestoreState", internalState);
             ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_Histograms", GPUBuffers.Get.Histograms);
             ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_HistogramsLookup", GPUBuffers.Get.HistogramsLookup);
-            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstancesInfo);
             ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
             ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceOcclusionFlags", GPUBuffers.Get.LipidInstanceOcclusionFlags);
             ComputeShaderManager.Get.ComputeVisibilityCS.Dispatch(4, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
@@ -529,7 +529,7 @@ public static class CutAwayUtils
             ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_Histograms", GPUBuffers.Get.Histograms);
             ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_HistogramsLookup", GPUBuffers.Get.HistogramsLookup);
             ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_IngredientMaskParams", GPUBuffers.Get.IngredientMaskParams);
-            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstanceInfo);
+            ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstancesInfo);
             ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
             ComputeShaderManager.Get.ComputeVisibilityCS.SetBuffer(4, "_LipidInstanceOcclusionFlags", GPUBuffers.Get.LipidInstanceOcclusionFlags);
             ComputeShaderManager.Get.ComputeVisibilityCS.Dispatch(4, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);

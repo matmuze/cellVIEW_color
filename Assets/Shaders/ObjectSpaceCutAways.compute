@@ -44,12 +44,12 @@ float CutAwayTest(float4 sphere, int ingredientType, int id)
 		//inverse
 		if (info.info.w == 1)
 		{
-			distance -= sphere.w;
+			//distance -= sphere.w;
 			distance *= -1;
 		}
 		else
 		{
-			distance += sphere.w;
+			//distance += sphere.w;
 		}
 
 		bool test = distance <= 0.0;

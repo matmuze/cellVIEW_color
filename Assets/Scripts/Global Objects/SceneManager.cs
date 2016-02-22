@@ -20,6 +20,8 @@ enum InstanceState
 [ExecuteInEditMode]
 public class SceneManager : MonoBehaviour
 {
+    
+
     // Declare the scene manager as a singleton
     private static SceneManager _instance = null;
 
@@ -46,6 +48,8 @@ public class SceneManager : MonoBehaviour
     }
 
     //--------------------------------------------------------------
+
+    public List<KeyValuePair<string, Color>> IngredientsColors;
     
     [HideInInspector]
     public string SceneName;
@@ -61,6 +65,10 @@ public class SceneManager : MonoBehaviour
     //public List<Compartment> Compartments;
     [HideInInspector]
     public List<IngredientGroup> IngredientGroups;
+
+    [HideInInspector]
+    public List<Ingredient> Ingredients;
+
     //[HideInInspector]
     //public List<Ingredient> ProteinIngredients;
 
@@ -145,7 +153,7 @@ public class SceneManager : MonoBehaviour
 
     public void OnDestroy()
     {
-        ClearScene();
+        //ClearScene();
     }
 
     public static bool CheckInstance()
@@ -182,6 +190,7 @@ public class SceneManager : MonoBehaviour
             if (field.FieldType.FullName.Contains("System.Collections.Generic.List"))
             {
                 var v = field.GetValue(this) as IList;
+                if (v == null) continue;
                 v.Clear();
             }
         }
@@ -194,7 +203,7 @@ public class SceneManager : MonoBehaviour
 
     #region Ingredients
 
-    //*** Global Ingredients ****//
+    //*** Hierarchy stuffs ****//
 
     public void AddIngredientToHierarchy(string ingredientUrlPath)
     {
@@ -222,6 +231,46 @@ public class SceneManager : MonoBehaviour
             {
                 throw new Exception("Ingredient path already used");
             }
+        }
+    }
+
+    private IngredientGroup GetIngredientGroup(string path)
+    {
+        return IngredientGroups.FirstOrDefault(@group => @group.path == path);
+    }
+
+    private IngredientGroup GetIngredientGroup(int index)
+    {
+        return IngredientGroups[index];
+    }
+
+    private void RemoveIngredientGroup(string path)
+    {
+        for (var i = 0; i < IngredientGroups.Count; i++)
+        {
+            if (!IngredientGroups[i].path.Contains(path)) continue;
+            IngredientGroups.RemoveAt(i);
+            break;
+        }
+    }
+
+    private void RemoveIngredientGroupFromName(string name)
+    {
+        for (var i = 0; i < IngredientGroups.Count; i++)
+        {
+            if (!IngredientGroups[i].name.Contains(name)) continue;
+            IngredientGroups.RemoveAt(i);
+            break;
+        }
+    }
+
+    private void RemoveElementFromHierarchy(string path)
+    {
+        var toRemove = SceneHierarchy.Where(element => element.Contains(path)).ToList();
+
+        foreach (var element in toRemove)
+        {
+            SceneHierarchy.Remove(element);
         }
     }
 
@@ -385,27 +434,81 @@ public class SceneManager : MonoBehaviour
 
     //*** Membrane Ingredients ****//
 
+    
+
+
     public void AddMembrane(string filePath, Vector3 position, Quaternion rotation)
     {
-        var pathInner = "root.membrane.inner_membrane";
-        var pathOuter = "root.membrane.outer_membrane";
+        var groupName = "membrane";
+        var groupPath = "root.envelope." + groupName;
 
-        AddIngredientToHierarchy(pathInner);
-        AddIngredientToHierarchy(pathOuter);
+        var nameInner = "inner_membrane";
+        var nameOuter = "outer_membrane";
 
+        var pathInner = groupPath + "." + nameInner;
+        var pathOuter = groupPath + "." + nameOuter;
+
+
+        RemoveElementFromHierarchy("membrane");
+        RemoveIngredientGroupFromName("membrane");
+        RemoveIngredientGroupFromName("membrane");
+
+        _ingredientNames.Clear();
         LipidIngredientNames.Clear();
-        LipidIngredientNames.Add(pathInner);
-        LipidIngredientNames.Add(pathOuter);
-
+        RemoveIngredientGroup(groupPath);
+        RemoveElementFromHierarchy(groupPath);
+        
         CPUBuffers.Get.LipidAtomPositions.Clear();
         CPUBuffers.Get.LipidInstanceInfos.Clear();
         CPUBuffers.Get.LipidInstancePositions.Clear();
 
-        var currentLipidAtoms = new List<Vector4>();
-        var membraneData = MyUtility.ReadBytesAsFloats(filePath);
+        //*****//
+
+        AddIngredientToHierarchy(pathInner);
+        AddIngredientToHierarchy(pathOuter);
+        LipidIngredientNames.Add(pathInner);
+        LipidIngredientNames.Add(pathOuter);
 
         var ingredientIdInner = AllIngredientNames.IndexOf(pathInner);
         var ingredientIdOuter = AllIngredientNames.IndexOf(pathOuter);
+
+        var envelopeSurfaceGroup = GetIngredientGroup("root.envelope.surface");
+        var envelopeMembraneGroup = new IngredientGroup();
+
+        envelopeMembraneGroup.Ingredients = new List<Ingredient>();
+        envelopeMembraneGroup.compartment_id = envelopeSurfaceGroup.compartment_id;
+        envelopeMembraneGroup.unique_id = IngredientGroups.Count;
+        envelopeMembraneGroup._groupType = -1;
+        envelopeMembraneGroup.name = groupName;
+        envelopeMembraneGroup.path = groupPath;
+        envelopeMembraneGroup.NumIngredients = 2;
+
+        var innerMembraneIngredient = new Ingredient();
+        innerMembraneIngredient.nbMol = 1;
+        innerMembraneIngredient._nbChains = 1;
+        innerMembraneIngredient._ingredientGroupId = envelopeMembraneGroup.unique_id;
+        innerMembraneIngredient._ingredientId = ingredientIdInner;
+        innerMembraneIngredient.name = nameInner;
+        innerMembraneIngredient.path = pathInner;
+
+        var outerMembraneIngredient = new Ingredient();
+        outerMembraneIngredient.nbMol = 1;
+        outerMembraneIngredient.nbChains = 1;
+        outerMembraneIngredient.ingredient_group_id = envelopeMembraneGroup.unique_id;
+        outerMembraneIngredient._ingredientId = ingredientIdOuter;
+        outerMembraneIngredient.name = nameOuter;
+        outerMembraneIngredient.path = pathOuter;
+
+        envelopeMembraneGroup.Ingredients.Add(innerMembraneIngredient);
+        envelopeMembraneGroup.Ingredients.Add(outerMembraneIngredient);
+        IngredientGroups.Add(envelopeMembraneGroup);
+
+        ColorManager.Get.InitColors();
+
+        //int a = 0;
+
+        var currentLipidAtoms = new List<Vector4>();
+        var membraneData = MyUtility.ReadBytesAsFloats(filePath);
 
         var step = 5;
         var dataIndex = 0;
@@ -460,6 +563,6 @@ public class SceneManager : MonoBehaviour
         }
     }
 
+    
     #endregion
-
 }

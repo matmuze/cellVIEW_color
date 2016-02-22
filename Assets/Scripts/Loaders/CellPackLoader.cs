@@ -10,17 +10,7 @@ namespace Loaders
 {
     public class CellPackLoader
     {
-        public static string GetInputFile(string extension, string lastFileLoaded = null)
-        {
-            var directory = Application.dataPath;
-
-            if (!string.IsNullOrEmpty(lastFileLoaded) && Directory.Exists(Path.GetDirectoryName(lastFileLoaded)))
-            {
-                directory = Path.GetDirectoryName(GlobalProperties.Get.LastRecipeFileLoaded);
-            }
-
-            return EditorUtility.OpenFilePanel("Select ." + extension, directory, extension);
-        }
+        
 
         //***************** Load cellPACK recipe *********************//
 
@@ -35,7 +25,7 @@ namespace Loaders
 
             if (string.IsNullOrEmpty(path) || !File.Exists(path))
             {
-                path = GetInputFile("json", GlobalProperties.Get.LastRecipeFileLoaded);
+                path = MyUtility.GetInputFile("json", GlobalProperties.Get.LastRecipeFileLoaded);
             }
 
             if (path == null || !File.Exists(path)) return;
@@ -196,7 +186,7 @@ namespace Loaders
         {
             if (string.IsNullOrEmpty(path) || !File.Exists(path))
             {
-                path = GetInputFile("bin", GlobalProperties.Get.LastPositionsFileLoaded);
+                path = MyUtility.GetInputFile("bin", GlobalProperties.Get.LastPositionsFileLoaded);
             }
 
             if (string.IsNullOrEmpty(path)) return;
@@ -268,6 +258,23 @@ namespace Loaders
             Debug.Log("*****");
             Debug.Log("Positions loaded succesfully");
             Debug.Log("*****");
+        }
+
+        public static void LoadMembrane(string path = null)
+        {
+            if (string.IsNullOrEmpty(path) || !File.Exists(path))
+            {
+                path = MyUtility.GetInputFile("mbr", GlobalProperties.Get.LastMembraneFileLoaded);
+            }
+
+            if (string.IsNullOrEmpty(path)) return;
+            GlobalProperties.Get.LastMembraneFileLoaded = path;
+
+            // Add membrane
+            SceneManager.Get.AddMembrane(path, Vector3.zero, Quaternion.identity);
+
+            // Upload scene data to the GPU
+            CPUBuffers.Get.CopyDataToGPU();
         }
     }
 }

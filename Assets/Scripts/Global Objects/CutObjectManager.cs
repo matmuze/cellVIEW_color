@@ -86,7 +86,7 @@ public class CutObjectManager : MonoBehaviour
         {
             if (cut == null) throw new Exception("Cut object not fofund");
 
-            CutScales.Add(cut.transform.localScale);
+            CutScales.Add(cut.transform.lossyScale);
             CutPositions.Add(cut.transform.position);
             CutRotations.Add(MyUtility.QuanternionToVector4(cut.transform.rotation));
             //CutInfos.Add(new Vector4((float)cut.CutType, cut.Value1, cut.Value2, cut.Inverse ? 1.0f : 0.0f));

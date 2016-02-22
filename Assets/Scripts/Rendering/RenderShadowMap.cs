@@ -68,5 +68,12 @@ public class RenderShadowMap : MonoBehaviour
             RenderUtils.ComputeSphereBatches(lightCamera);
             RenderUtils.DrawProteinsShadowMap(RenderProteinMaterial, lightCamera, ShadowMap2.colorBuffer, ShadowMap2.depthBuffer, 1);
         }
+
+        // Draw Lipids
+        if (SceneManager.Get.NumLipidInstances > 0)
+        {
+            RenderUtils.ComputeLipidSphereBatches(lightCamera);
+            RenderUtils.DrawLipidShadows(RenderLipidMaterial, ShadowMap2, ShadowMap2);
+        }
     }
 }

@@ -11,12 +11,46 @@ using UnityEngine;
 public class CellViewMenuCommands
 {
     // Add menu item named "My Window" to the Window menu
+    [MenuItem("cellVIEW/Load Color Palette")]
+    public static void LoadColorPalette()
+    {
+        ColorManager.Get.LoadColorPalette();
+        EditorUtility.SetDirty(SceneManager.Get);
+        EditorSceneManager.MarkAllScenesDirty();
+    }
+
+    // Add menu item named "My Window" to the Window menu
+    [MenuItem("cellVIEW/Reload Color Palette")]
+    public static void ReloadColorPalette()
+    {
+        ColorManager.Get.LoadColorPalette(GlobalProperties.Get.LastColorPaletteLoaded);
+        EditorUtility.SetDirty(SceneManager.Get);
+        EditorSceneManager.MarkAllScenesDirty();
+    }
+
+    // Add menu item named "My Window" to the Window menu
+    [MenuItem("cellVIEW/Save Color Palette")]
+    public static void SaveColorPalette()
+    {
+        ColorManager.Get.SaveCurrentColorPalette();
+        //EditorUtility.SetDirty(SceneManager.Get);
+        //EditorSceneManager.MarkAllScenesDirty();
+    }
+
+    // Add menu item named "My Window" to the Window menu
     [MenuItem("cellVIEW/Reload Colors")]
     public static void ReloadColors()
     {
         ColorManager.Get.ReloadColors();
         EditorUtility.SetDirty(SceneManager.Get);
         EditorSceneManager.MarkAllScenesDirty();
+    }
+
+    // Add menu item named "My Window" to the Window menu
+    [MenuItem("cellVIEW/Load Membrane")]
+    public static void LoadMembrane()
+    {
+        CellPackLoader.LoadMembrane();
     }
 
     [MenuItem("cellVIEW/Options")]

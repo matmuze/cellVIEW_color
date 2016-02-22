@@ -7,16 +7,37 @@ using UnityEditor.SceneManagement;
 [CustomEditor(typeof(ColorManager))]
 public class ColorManagerInspector : Editor
 {
-    public bool[] b;
+    public bool foldout;
+    public bool[] foldouts;
 
     public override void OnInspectorGUI()
     {
+        foldout = EditorGUILayout.Foldout(foldout, "Custom Colors");
+        if (foldout)
+        {
+            for (int i = 0; i < CPUBuffers.Get.IngredientsColors.Count; i++)
+            {
+                CPUBuffers.Get.IngredientsColors[i] = EditorGUILayout.ColorField(i + " - "+ SceneManager.Get.AllIngredientNames[i],
+                    CPUBuffers.Get.IngredientsColors[i]);
+            }
+        }
+
+        // Make all scene dirty to get changes to save
+        if (GUI.changed)
+        {
+            EditorUtility.SetDirty(target);
+            EditorSceneManager.MarkAllScenesDirty();
+            GPUBuffers.Get.IngredientsColors.SetData(CPUBuffers.Get.IngredientsColors.ToArray());
+        }
+
+        return;
+
         DrawDefaultInspector();
         var colorManager = (ColorManager)target;
-
-        if (b == null || b.Length != CPUBuffers.Get.IngredientGroupsColorRanges.Count)
+        
+        if (foldouts == null || foldouts.Length != CPUBuffers.Get.IngredientGroupsColorRanges.Count)
         {
-            b = new bool[CPUBuffers.Get.IngredientGroupsColorRanges.Count];
+            foldouts = new bool[CPUBuffers.Get.IngredientGroupsColorRanges.Count];
         }
 
         if (!ColorManager.Get.UseDistanceLevels)
@@ -42,8 +63,8 @@ public class ColorManagerInspector : Editor
 
         for (int i = 0; i < CPUBuffers.Get.IngredientGroupsColorRanges.Count; i++)
         {
-            b[i] = EditorGUILayout.Foldout(b[i], "Group " + i);
-            if (b[i])
+            foldouts[i] = EditorGUILayout.Foldout(foldouts[i], "Group " + i);
+            if (foldouts[i])
             {
                 var hclColor = new Vector3();
                 var hclRange = new Vector3();

@@ -32,7 +32,7 @@
 		float4 position = _LipidInstancePositions[batchInfo.x];
 
 		output.id = batchInfo.x; // Offset id to get unique id
-		output.type = 0;		
+		output.type = batchInfo.y;		
 		output.state = 0;
 		output.rot = float4(0,0,0,1);	
 		output.color = float3(1,1,0); // Read color here and pass it to the next levels to avoid unnecessary buffer reads
@@ -188,6 +188,22 @@
 		depth = 1 / (eyeDepth * _ZBufferParams.z) - _ZBufferParams.w / _ZBufferParams.z;			
 	}
 	
+	// Shadow map using eye depth
+	void fs_shadow(gs2fs input, out float eyeDepth : SV_TARGET0) //, out float depth : sv_depthgreaterequal)
+	{		
+		float lensqr = dot(input.uv, input.uv);   
+		if(lensqr > 1) discard;
+			
+		eyeDepth = abs(LinearEyeDepth(input.pos.z));
+
+		//// Find normal
+		//float3 normal = normalize(float3(input.uv, sqrt(1.0 - lensqr)));		
+
+		//// Find depth
+		//float eyeDepth = LinearEyeDepth(input.pos.z) + input.radius * (1-normal.z);
+		//depth = 1 / (eyeDepth * _ZBufferParams.z) - _ZBufferParams.w / _ZBufferParams.z;
+	}
+
 	ENDCG
 
 	SubShader 
@@ -208,6 +224,26 @@
 			#pragma domain ds_lipid				
 			#pragma geometry gs_lipid			
 			#pragma fragment fs_lipid
+						
+			ENDCG
+		}
+
+		Pass 
+	    {
+			ZWrite On
+
+	    	CGPROGRAM			
+	    		
+			#include "UnityCG.cginc"
+			
+			#pragma only_renderers d3d11
+			#pragma target 5.0				
+			
+			#pragma vertex vs_lipid
+			#pragma hull hs
+			#pragma domain ds_lipid				
+			#pragma geometry gs_lipid			
+			#pragma fragment fs_shadow
 						
 			ENDCG
 		}

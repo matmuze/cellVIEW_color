@@ -126,7 +126,7 @@ void ComputeLipidSphereBatches (uint3 id : SV_DispatchThreadID)
 
 	if(cullFlag != 1 && !frustrumTest)
 	{
-		_LipidSphereBatches.Append(int4(id.x, 0, info.y, info.z));
+		_LipidSphereBatches.Append(int4(id.x, info.x, info.y, info.z));
 	}	
 }
 

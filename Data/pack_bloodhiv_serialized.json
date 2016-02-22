@@ -291,7 +291,7 @@
                 }
             ], 
             "local_id": 0, 
-            "name": "HIV1_envelope_Pack_145_0_2_0", 
+            "name": "envelope", 
             "unique_id": 1
         }, 
         {
@@ -387,7 +387,7 @@
                 }
             ], 
             "local_id": 1, 
-            "name": "HIV1_capsid_3j3q_PackInner_0_1_0", 
+            "name": "capsid", 
             "unique_id": 2
         }
     ], 
@@ -628,7 +628,7 @@
             ], 
             "fiber": false, 
             "local_id": 0, 
-            "name": "cytoplasme", 
+            "name": "plasma", 
             "unique_id": 0
         }
     ], 

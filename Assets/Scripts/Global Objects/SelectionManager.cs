@@ -142,15 +142,15 @@ public class SelectionManager : MonoBehaviour
 
     public void SetSelectedObject(int instanceID)
     {
+        if (instanceID >= CPUBuffers.Get.ProteinInstancePositions.Count) return;
+
         Debug.Log("*****");
 
         //if (!ValidateInstanceID(_selectedObjectID)) return;
 
-        Debug.Log("Selected element id: " + instanceID);
-
+        Debug.Log("Selected element id: " + instanceID); if (instanceID >= CPUBuffers.Get.ProteinInstancePositions.Count) return;
         if (instanceID > 0) Debug.Log("Selected element type: " + CPUBuffers.Get.ProteinInstanceInfos[instanceID].x);
-        if (instanceID >= CPUBuffers.Get.ProteinInstancePositions.Count) return;
-
+        
         // If element id is different than the currently selected element
         if (_selectedObjectID != instanceID)
         {

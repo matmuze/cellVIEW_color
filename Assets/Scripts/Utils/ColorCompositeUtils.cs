@@ -51,40 +51,37 @@ public static class ColorCompositeUtils
 
         colorCompositeMaterial.SetInt("_UseDistanceLevels", Convert.ToInt32(ColorManager.Get.UseDistanceLevels));
         
-
         colorCompositeMaterial.SetInt("_NumLevelMax", ColorManager.Get.NumLevelMax);
         colorCompositeMaterial.SetInt("_DistanceMax", ColorManager.Get.DistanceMax);
         colorCompositeMaterial.SetMatrix("_LevelRanges", rangeValues);
 
-        // *****
-
+        //*****//
         colorCompositeMaterial.SetFloat("_LevelLerpFactor", ColorManager.Get.LevelLerpFactor);
         colorCompositeMaterial.SetInt("_NumPixels", instanceIdBuffer.width * instanceIdBuffer.height);
-        //possible also with vectors, setvector
 
+        //*****//
         colorCompositeMaterial.SetTexture("_DepthBuffer", depthBuffer);
         colorCompositeMaterial.SetTexture("_AtomIdBuffer", atomIdBuffer);
         colorCompositeMaterial.SetTexture("_InstanceIdBuffer", instanceIdBuffer);
 
         // Properties
+        colorCompositeMaterial.SetBuffer("_ProteinAtomInfos", GPUBuffers.Get.ProteinAtomInfo);
+        colorCompositeMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
+        colorCompositeMaterial.SetBuffer("_LipidAtomInfos", GPUBuffers.Get.LipidAtomPositions);
+        colorCompositeMaterial.SetBuffer("_LipidInstancesInfo", GPUBuffers.Get.LipidInstancesInfo);
 
+        colorCompositeMaterial.SetBuffer("_IngredientsInfo", GPUBuffers.Get.ProteinIngredientsInfo);
         colorCompositeMaterial.SetBuffer("_IngredientGroupsColorInfo", GPUBuffers.Get.IngredientGroupsColorInfo);
         colorCompositeMaterial.SetBuffer("_ProteinIngredientsColorInfo", GPUBuffers.Get.ProteinIngredientsColorInfo);
 
-        colorCompositeMaterial.SetBuffer("_ProteinAtomInfos", GPUBuffers.Get.ProteinAtomInfo);
-        colorCompositeMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
-        colorCompositeMaterial.SetBuffer("_ProteinIngredientProperties", GPUBuffers.Get.ProteinIngredientsInfo);
-
         // Predifined colors 
-
         colorCompositeMaterial.SetBuffer("_AtomColors", GPUBuffers.Get.AtomColors);
         colorCompositeMaterial.SetBuffer("_AminoAcidColors", GPUBuffers.Get.AminoAcidColors);
-        colorCompositeMaterial.SetBuffer("_ProteinIngredientsColors", GPUBuffers.Get.ProteinIngredientsColors);
-        colorCompositeMaterial.SetBuffer("_ProteinIngredientsChainColors", GPUBuffers.Get.ProteinIngredientsChainColors);
+        colorCompositeMaterial.SetBuffer("_IngredientsColors", GPUBuffers.Get.IngredientsColors);
+        colorCompositeMaterial.SetBuffer("_IngredientsChainColors", GPUBuffers.Get.IngredientsChainColors);
         colorCompositeMaterial.SetBuffer("_IngredientGroupsColor", GPUBuffers.Get.IngredientGroupsColor);
 
         // Values for color generation on the fly 
-
         colorCompositeMaterial.SetBuffer("_IngredientGroupsLerpFactors", GPUBuffers.Get.IngredientGroupsLerpFactors);
         colorCompositeMaterial.SetBuffer("_IngredientGroupsColorValues", GPUBuffers.Get.IngredientGroupsColorValues);
         colorCompositeMaterial.SetBuffer("_IngredientGroupsColorRanges", GPUBuffers.Get.IngredientGroupsColorRanges);

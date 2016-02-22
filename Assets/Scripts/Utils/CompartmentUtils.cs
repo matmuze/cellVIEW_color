@@ -6,6 +6,13 @@ using System.Text;
 using Loaders;
 using Newtonsoft.Json;
 
+public enum GroupType
+{
+    Proteins = 0,
+    Lipids = 1,
+    Fibers = 2
+};
+
 namespace Assets.Scripts.Loaders
 {
     public class CompartmentUtility

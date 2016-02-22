@@ -108,7 +108,7 @@ public class CPUBuffers : MonoBehaviour
     public List<Vector4> ProteinIngredientsChainColors = new List<Vector4>();
 
     [HideInInspector]
-    public List<Vector4> ProteinIngredientsColors = new List<Vector4>();
+    public List<Vector4> IngredientsColors = new List<Vector4>();
     [HideInInspector]
     public List<Vector4> ProteinIngredientsProperties = new List<Vector4>();
     [HideInInspector]
@@ -153,6 +153,7 @@ public class CPUBuffers : MonoBehaviour
             if (field.FieldType.FullName.Contains("System.Collections.Generic.List"))
             {
                 var v = field.GetValue(this) as IList;
+                if (v == null) continue;
                 v.Clear();
             }
         }
@@ -225,12 +226,14 @@ public class CPUBuffers : MonoBehaviour
         //CheckBufferSizes();
 
         GPUBuffers.Get.InitBuffers();
-        GPUBuffers.Get.ArgBuffer.SetData(new[] { 0, 1, 0, 0 });
+
+        var initArgs = new[] {0, 1, 0, 0};
+        GPUBuffers.Get.ArgBuffer.SetData(initArgs);
 
         GPUBuffers.Get.AtomColors.SetData(AtomHelper.AtomColors);
         GPUBuffers.Get.AminoAcidColors.SetData(AtomHelper.ResidueColors);
-        GPUBuffers.Get.ProteinIngredientsColors.SetData(CPUBuffers.Get.ProteinIngredientsColors.ToArray());
-        GPUBuffers.Get.ProteinIngredientsChainColors.SetData(CPUBuffers.Get.ProteinIngredientsChainColors.ToArray());
+        GPUBuffers.Get.IngredientsColors.SetData(CPUBuffers.Get.IngredientsColors.ToArray());
+        GPUBuffers.Get.IngredientsChainColors.SetData(CPUBuffers.Get.ProteinIngredientsChainColors.ToArray());
         GPUBuffers.Get.ProteinAtomInfo.SetData(CPUBuffers.Get.ProteinAtomInfo.ToArray());
         GPUBuffers.Get.ProteinIngredientsInfo.SetData(CPUBuffers.Get.ProteinIngredientsProperties.ToArray());
         GPUBuffers.Get.IngredientGroupsColor.SetData(CPUBuffers.Get.IngredientGroupsColor.ToArray());
@@ -252,7 +255,7 @@ public class CPUBuffers : MonoBehaviour
 
         // Upload ingredient data
         GPUBuffers.Get.ProteinRadii.SetData(CPUBuffers.Get.ProteinIngredientsRadii.ToArray());
-        GPUBuffers.Get.ProteinIngredientsColors.SetData(CPUBuffers.Get.ProteinIngredientsColors.ToArray());
+        GPUBuffers.Get.IngredientsColors.SetData(CPUBuffers.Get.IngredientsColors.ToArray());
         GPUBuffers.Get.IngredientMaskParams.SetData(CPUBuffers.Get.ProteinToggleFlags.ToArray());
 
         GPUBuffers.Get.ProteinAtoms.SetData(CPUBuffers.Get.ProteinAtoms.ToArray());
@@ -283,7 +286,7 @@ public class CPUBuffers : MonoBehaviour
 
         // Upload lipid data
         GPUBuffers.Get.LipidAtomPositions.SetData(CPUBuffers.Get.LipidAtomPositions.ToArray());
-        GPUBuffers.Get.LipidInstanceInfo.SetData(CPUBuffers.Get.LipidInstanceInfos.ToArray());
+        GPUBuffers.Get.LipidInstancesInfo.SetData(CPUBuffers.Get.LipidInstanceInfos.ToArray());
         GPUBuffers.Get.LipidInstancePositions.SetData(CPUBuffers.Get.LipidInstancePositions.ToArray());
     }
     

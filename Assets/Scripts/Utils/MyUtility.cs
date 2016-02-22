@@ -12,6 +12,42 @@ using UnityEditor;
 
 public static class MyUtility
 {
+    public static string GetInputFile(string extension, string lastFileLoaded = null)
+    {
+        var directory = Application.dataPath;
+
+        if (!string.IsNullOrEmpty(lastFileLoaded) && Directory.Exists(Path.GetDirectoryName(lastFileLoaded)))
+        {
+            directory = Path.GetDirectoryName(lastFileLoaded);
+        }
+
+        return EditorUtility.OpenFilePanel("Select ." + extension, directory, extension);
+    }
+
+    public static string GetOutputFile(string extension, string lastFileLoaded = null)
+    {
+        var directory = Application.dataPath;
+
+        if (!string.IsNullOrEmpty(lastFileLoaded) && Directory.Exists(Path.GetDirectoryName(lastFileLoaded)))
+        {
+            directory = Path.GetDirectoryName(lastFileLoaded);
+        }
+
+        return EditorUtility.SaveFilePanel("Save current palette", directory, "palette_" + DateTime.Now, "json");
+    }
+
+    //public static string SetOuputFile(string extension, string lastFileLoaded = null)
+    //{
+    //    var directory = Application.dataPath;
+
+    //    if (!string.IsNullOrEmpty(lastFileLoaded) && Directory.Exists(Path.GetDirectoryName(lastFileLoaded)))
+    //    {
+    //        directory = Path.GetDirectoryName(lastFileLoaded);
+    //    }
+
+    //    return EditorUtility.op("Select ." + extension, directory, extension);
+    //}
+
     /************** Path Utility *******************/
 
     private static string _pathSeparator = ".";

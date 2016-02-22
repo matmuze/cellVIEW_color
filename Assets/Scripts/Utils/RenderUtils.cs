@@ -17,7 +17,7 @@ public static class RenderUtils
         renderProteinsMaterial.SetBuffer("_ProteinInstancePositions", GPUBuffers.Get.ProteinInstancePositions);
         renderProteinsMaterial.SetBuffer("_ProteinInstanceRotations", GPUBuffers.Get.ProteinInstanceRotations);
 
-        renderProteinsMaterial.SetBuffer("_ProteinColors", GPUBuffers.Get.ProteinIngredientsColors);
+        renderProteinsMaterial.SetBuffer("_ProteinColors", GPUBuffers.Get.IngredientsColors);
         renderProteinsMaterial.SetBuffer("_ProteinAtomPositions", GPUBuffers.Get.ProteinAtoms);
         renderProteinsMaterial.SetBuffer("_ProteinClusterPositions", GPUBuffers.Get.ProteinAtomClusters);
         renderProteinsMaterial.SetBuffer("_ProteinSphereBatchInfos", GPUBuffers.Get.SphereBatches);
@@ -40,7 +40,7 @@ public static class RenderUtils
         renderProteinsMaterial.SetBuffer("_ProteinInstancePositions", GPUBuffers.Get.ProteinInstancePositions);
         renderProteinsMaterial.SetBuffer("_ProteinInstanceRotations", GPUBuffers.Get.ProteinInstanceRotations);
 
-        renderProteinsMaterial.SetBuffer("_ProteinColors", GPUBuffers.Get.ProteinIngredientsColors);
+        renderProteinsMaterial.SetBuffer("_ProteinColors", GPUBuffers.Get.IngredientsColors);
         renderProteinsMaterial.SetBuffer("_ProteinAtomPositions", GPUBuffers.Get.ProteinAtoms);
         renderProteinsMaterial.SetBuffer("_ProteinClusterPositions", GPUBuffers.Get.ProteinAtomClusters);
         renderProteinsMaterial.SetBuffer("_ProteinSphereBatchInfos", GPUBuffers.Get.SphereBatches);
@@ -64,7 +64,7 @@ public static class RenderUtils
         renderProteinsMaterial.SetBuffer("_ProteinInstancePositions", GPUBuffers.Get.ProteinInstancePositions);
         renderProteinsMaterial.SetBuffer("_ProteinInstanceRotations", GPUBuffers.Get.ProteinInstanceRotations);
 
-        renderProteinsMaterial.SetBuffer("_ProteinColors", GPUBuffers.Get.ProteinIngredientsColors);
+        renderProteinsMaterial.SetBuffer("_ProteinColors", GPUBuffers.Get.IngredientsColors);
         renderProteinsMaterial.SetBuffer("_ProteinAtomInfo", GPUBuffers.Get.ProteinAtomInfo);
         renderProteinsMaterial.SetBuffer("_ProteinAtomPositions", GPUBuffers.Get.ProteinAtoms);
         renderProteinsMaterial.SetBuffer("_ProteinClusterPositions", GPUBuffers.Get.ProteinAtomClusters);
@@ -99,7 +99,7 @@ public static class RenderUtils
         renderProteinsMaterial.SetBuffer("_ProteinInstancePositions", GPUBuffers.Get.ProteinInstancePositions);
         renderProteinsMaterial.SetBuffer("_ProteinInstanceRotations", GPUBuffers.Get.ProteinInstanceRotations);
 
-        renderProteinsMaterial.SetBuffer("_ProteinColors", GPUBuffers.Get.ProteinIngredientsColors);
+        renderProteinsMaterial.SetBuffer("_ProteinColors", GPUBuffers.Get.IngredientsColors);
         renderProteinsMaterial.SetBuffer("_ProteinAtomPositions", GPUBuffers.Get.ProteinAtoms);
         renderProteinsMaterial.SetBuffer("_ProteinClusterPositions", GPUBuffers.Get.ProteinAtomClusters);
         renderProteinsMaterial.SetBuffer("_ProteinSphereBatchInfos", GPUBuffers.Get.SphereBatches);
@@ -122,7 +122,7 @@ public static class RenderUtils
     //    renderProteinsMaterial.SetBuffer("_ProteinInstancePositions", GPUBuffers.Get.ProteinInstancePositions);
     //    renderProteinsMaterial.SetBuffer("_ProteinInstanceRotations", GPUBuffers.Get.ProteinInstanceRotations);
 
-    //    renderProteinsMaterial.SetBuffer("_ProteinColors", GPUBuffers.Get.ProteinIngredientsColors);
+    //    renderProteinsMaterial.SetBuffer("_ProteinColors", GPUBuffers.Get.IngredientsColors);
     //    renderProteinsMaterial.SetBuffer("_ProteinAtomInfo", GPUBuffers.Get.ProteinAtomInfo);
     //    renderProteinsMaterial.SetBuffer("_ProteinAtomPositions", GPUBuffers.Get.ProteinAtoms);
     //    renderProteinsMaterial.SetBuffer("_ProteinClusterPositions", GPUBuffers.Get.ProteinAtomClusters);
@@ -195,5 +195,58 @@ public static class RenderUtils
 
         ComputeShaderManager.Get.SphereBatchCS.Dispatch(4, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
         ComputeBuffer.CopyCount(GPUBuffers.Get.SphereBatches, GPUBuffers.Get.ArgBuffer, 0);
+    }
+
+
+
+    public static void ComputeLipidSphereBatches(Camera camera)
+    {
+        if (SceneManager.Get.NumLipidInstances <= 0) return;
+
+        // Always clear append buffer before usage
+        GPUBuffers.Get.SphereBatches.ClearAppendBuffer();
+
+        ComputeShaderManager.Get.SphereBatchCS.SetFloat("_Scale", GlobalProperties.Get.Scale);
+        ComputeShaderManager.Get.SphereBatchCS.SetInt("_NumLevels", SceneManager.Get.NumLodLevels);
+        ComputeShaderManager.Get.SphereBatchCS.SetInt("_NumInstances", SceneManager.Get.NumLipidInstances);
+        ComputeShaderManager.Get.SphereBatchCS.SetInt("_EnableLod", Convert.ToInt32(GlobalProperties.Get.EnableLod));
+        ComputeShaderManager.Get.SphereBatchCS.SetVector("_CameraForward", camera.transform.forward);
+        ComputeShaderManager.Get.SphereBatchCS.SetVector("_CameraPosition", camera.transform.position);
+        ComputeShaderManager.Get.SphereBatchCS.SetFloats("_FrustrumPlanes", MyUtility.FrustrumPlanesAsFloats(camera));
+
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(2, "_LipidInstanceInfo", GPUBuffers.Get.LipidInstancesInfo);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(2, "_LipidInstancePositions", GPUBuffers.Get.LipidInstancePositions);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(2, "_LipidInstanceCullFlags", GPUBuffers.Get.LipidInstanceCullFlags);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(2, "_LipidInstanceOcclusionFlags", GPUBuffers.Get.LipidInstanceOcclusionFlags);
+        ComputeShaderManager.Get.SphereBatchCS.SetBuffer(2, "_LipidSphereBatches", GPUBuffers.Get.SphereBatches);
+        ComputeShaderManager.Get.SphereBatchCS.Dispatch(2, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
+        ComputeBuffer.CopyCount(GPUBuffers.Get.SphereBatches, GPUBuffers.Get.ArgBuffer, 0);
+
+    }
+
+    public static void DrawLipidSphereBatches(Material RenderLipidsMaterial, RenderTexture colorBuffer, RenderTexture depthBuffer)
+    {
+        RenderLipidsMaterial.SetFloat("_Scale", GlobalProperties.Get.Scale);
+        RenderLipidsMaterial.SetBuffer("_LipidSphereBatches", GPUBuffers.Get.SphereBatches);
+        RenderLipidsMaterial.SetBuffer("_LipidAtomPositions", GPUBuffers.Get.LipidAtomPositions);
+        //RenderLipidsMaterial.SetBuffer("_LipidInstanceInfos", GPUBuffer.Get.LipidInstanceInfos);
+        RenderLipidsMaterial.SetBuffer("_LipidInstancePositions", GPUBuffers.Get.LipidInstancePositions);
+        RenderLipidsMaterial.SetPass(0);
+
+        Graphics.SetRenderTarget(colorBuffer.colorBuffer, depthBuffer.depthBuffer);
+        Graphics.DrawProceduralIndirect(MeshTopology.Points, GPUBuffers.Get.ArgBuffer);
+    }
+
+    public static void DrawLipidShadows(Material RenderLipidsMaterial, RenderTexture colorBuffer, RenderTexture depthBuffer)
+    {
+        RenderLipidsMaterial.SetFloat("_Scale", GlobalProperties.Get.Scale);
+        RenderLipidsMaterial.SetBuffer("_LipidSphereBatches", GPUBuffers.Get.SphereBatches);
+        RenderLipidsMaterial.SetBuffer("_LipidAtomPositions", GPUBuffers.Get.LipidAtomPositions);
+        //RenderLipidsMaterial.SetBuffer("_LipidInstanceInfos", GPUBuffer.Get.LipidInstanceInfos);
+        RenderLipidsMaterial.SetBuffer("_LipidInstancePositions", GPUBuffers.Get.LipidInstancePositions);
+        RenderLipidsMaterial.SetPass(1);
+
+        Graphics.SetRenderTarget(colorBuffer.colorBuffer, depthBuffer.depthBuffer);
+        Graphics.DrawProceduralIndirect(MeshTopology.Points, GPUBuffers.Get.ArgBuffer);
     }
 }

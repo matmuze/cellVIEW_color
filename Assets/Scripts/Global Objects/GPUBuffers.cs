@@ -104,8 +104,8 @@ public class GPUBuffers : MonoBehaviour
 
     public ComputeBuffer ProteinIngredientsInfo;
     public ComputeBuffer IngredientGroupsColor;
-    public ComputeBuffer ProteinIngredientsColors;
-    public ComputeBuffer ProteinIngredientsChainColors;
+    public ComputeBuffer IngredientsColors;
+    public ComputeBuffer IngredientsChainColors;
     public ComputeBuffer AminoAcidColors;
     public ComputeBuffer AtomColors;
 
@@ -146,7 +146,7 @@ public class GPUBuffers : MonoBehaviour
 
     // lipid buffers
     public ComputeBuffer LipidAtomPositions;
-    public ComputeBuffer LipidInstanceInfo;
+    public ComputeBuffer LipidInstancesInfo;
     public ComputeBuffer LipidInstancePositions;
     public ComputeBuffer LipidInstanceCullFlags;
     public ComputeBuffer LipidInstanceOcclusionFlags;
@@ -208,12 +208,16 @@ public class GPUBuffers : MonoBehaviour
 
     public void InitBuffers ()
     {
+
+        if (ArgBuffer == null) ArgBuffer = new ComputeBuffer(4, sizeof(int), ComputeBufferType.DrawIndirect);
+
+
         if (AtomColors == null) AtomColors = new ComputeBuffer(16, 16);
         if (AminoAcidColors == null) AminoAcidColors = new ComputeBuffer(32, 16);
-        if (ProteinIngredientsColors == null) ProteinIngredientsColors = new ComputeBuffer(NumProteinTypeMax, 16);
+        if (IngredientsColors == null) IngredientsColors = new ComputeBuffer(NumProteinTypeMax, 16);
         if (IngredientGroupsColor == null) IngredientGroupsColor = new ComputeBuffer(16, 16);
         if (ProteinIngredientsInfo == null) ProteinIngredientsInfo = new ComputeBuffer(NumIngredientMax, 16);
-        if (ProteinIngredientsChainColors == null) ProteinIngredientsChainColors = new ComputeBuffer(NumIngredientMax * 16, 16);
+        if (IngredientsChainColors == null) IngredientsChainColors = new ComputeBuffer(NumIngredientMax * 16, 16);
 
         if (IngredientGroupsColorInfo == null) IngredientGroupsColorInfo = new ComputeBuffer(16, 16);
         if (ProteinIngredientsColorInfo == null) ProteinIngredientsColorInfo = new ComputeBuffer(NumIngredientMax, 16);
@@ -225,7 +229,6 @@ public class GPUBuffers : MonoBehaviour
 
         //*****//
 
-        if (ArgBuffer == null) ArgBuffer = new ComputeBuffer(4, sizeof(int), ComputeBufferType.DrawIndirect);
         if (LodInfo == null) LodInfo = new ComputeBuffer(8, 16);
         if (SphereBatches == null) SphereBatches = new ComputeBuffer(NumProteinSphereBatchesMax, 16, ComputeBufferType.Append);
 
@@ -256,7 +259,7 @@ public class GPUBuffers : MonoBehaviour
         //*****//
 
         if (LipidAtomPositions == null) LipidAtomPositions = new ComputeBuffer(NumLipidAtomMax, 16);
-        if (LipidInstanceInfo == null) LipidInstanceInfo = new ComputeBuffer(NumLipidInstancesMax, 16);
+        if (LipidInstancesInfo == null) LipidInstancesInfo = new ComputeBuffer(NumLipidInstancesMax, 16);
         if (LipidInstancePositions == null) LipidInstancePositions = new ComputeBuffer(NumLipidInstancesMax, 16);
         if (LipidInstanceCullFlags == null) LipidInstanceCullFlags = new ComputeBuffer(NumLipidInstancesMax, 4);
         if (LipidInstanceOcclusionFlags == null) LipidInstanceOcclusionFlags = new ComputeBuffer(NumLipidInstancesMax, 4);
