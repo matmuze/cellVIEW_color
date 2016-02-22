@@ -249,6 +249,8 @@
 		}
 		else if (instanceId >= 0)
 		{
+			int colorChoice = 3;
+
 			AtomInfo atomInfo = _ProteinAtomInfos[atomId];
 			ProteinInstanceInfo proteinInstanceInfo = _ProteinInstanceInfo[instanceId];
 			ProteinIngredientInfo proteinIngredientInfo = _IngredientsInfo[proteinInstanceInfo.proteinIngredientType];
@@ -267,92 +269,85 @@
 			float4 proteinIngredientsChainColor = _IngredientsChainColors[proteinIngredientInfo.chainColorStartIndex + atomInfo.chainSymbolId];
 			float4 proteinIngredientsColor = _IngredientsColors[proteinInstanceInfo.proteinIngredientType];
 			float4 ingredientGroupColor = _IngredientGroupsColor[proteinIngredientInfo.proteinIngredientGroupId];
-			
+
 			// Goodsell coloring
 			float4 goodsellColor = (atomInfo.atomSymbolId == 0) ? proteinIngredientsChainColor : proteinIngredientsChainColor * (1- 0.25);
-			
-			color = proteinIngredientsColor;
-			return;
-
-
-			float4 beginColor = float4(0,0,0,0);
-			float4 endColor = float4(0,0,0,0);
-
-			beginColor = (level == 0) ? atomColor : beginColor;
-			endColor = (level == 0) ? goodsellColor : endColor;
-
-			beginColor = (level == 1) ? goodsellColor : beginColor;
-			endColor = (level == 1) ? proteinIngredientsChainColor : endColor;
-
-			beginColor = (level == 2) ? proteinIngredientsChainColor : beginColor;
-			endColor = (level == 2) ? proteinIngredientsColor : endColor;
-			
-			beginColor = (level == 3) ? proteinIngredientsColor : beginColor;
-			endColor = (level == 3) ? ingredientGroupColor : endColor;
-
-			beginColor = (level == 4) ? ingredientGroupColor : beginColor;
-			endColor = (level == 4) ? ingredientGroupColor : endColor;
-			
-			color = lerp(beginColor, endColor, lerpFactor);
-
-			//d3_hcl_lab(hclMelded.x, hclMelded.y, hclMelded.z), 1);
-			//color = float4(d3_hcl_lab(lerpColor.x, lerpColor.y, lerpColor.z), 1);
-
-			return;
-
-			//ingredientgroupcolor is of type color in C#, so i needed to rescale, kind of a hack. Should eventually be changed to vector.
-			ingredientGroupColor.x = ingredientGroupColor.x * 360;
-			ingredientGroupColor.y = ingredientGroupColor.y * 100;
-			ingredientGroupColor.z = ingredientGroupColor.z * 100;
 						
-		//	color = ingredientGroupColor;
-		//	return;
-
-			////*******//
-			//test compartment color
-			float h = proteinIngredientsColor.x;
-			float c = proteinIngredientsColor.y;
-			float l = proteinIngredientsChainColor.z;
-
-			float4 luminances;
-			luminances[0] = ingredientGroupColor.z;
-			luminances[1] = proteinIngredientsColor.z;
-			luminances[2] = proteinIngredientsChainColor.z;
-			luminances[3] = 70;
-			float4x2 HCs = float4x2(ingredientGroupColor.xy, proteinIngredientsColor.xy, proteinIngredientsChainColor.xy, atomColor.xy);
-			
-			//tbd, temporary replacement because atomcolor is rgb
-			HCs[3][0] = 100;
-			HCs[3][1] =70;
-
-	    	float3 hclMelded = getDepthLuminanceManuFormula(_depth , luminances, HCs);
-//tbd, temporary replacement because atomcolor is rgb
-	//		HCs[3][0] = 100;
-	//		HCs[3][1] =50;
-
-			color = aminoAcidColor;
-		//	return;
-			
-		//	h = hclMelded.x;
-		//	c = hclMelded.y;
-		//	lum = hclMelded.z;
-
-		//	color = float4(d3_hcl_lab(h, c, lum), 1);
-		//	color = float4(1,1,1, 1);
 			
 
+			if(colorChoice == 0)
+			{
+				color = proteinIngredientsColor;
+				return;
+			}
+			else if(colorChoice == 1)
+			{
+				float4 beginColor = float4(0,0,0,0);
+				float4 endColor = float4(0,0,0,0);
 
-		//	float3 proteinRandomValues = _ProteinIngredientsRandomValues[proteinInstanceInfo.proteinIngredientType].xyz;
-		//	float ingredientGroupsLerpFactors = _IngredientGroupsLerpFactors[proteinIngredientInfo.proteinIngredientGroupId];
-		//	float3 ingredientGroupsColorValues = _IngredientGroupsColorValues[proteinIngredientInfo.proteinIngredientGroupId].xyz;
-		//	float3 ingredientGroupsColorRanges = _IngredientGroupsColorRanges[proteinIngredientInfo.proteinIngredientGroupId].xyz;
+				beginColor = (level == 0) ? atomColor : beginColor;
+				endColor = (level == 0) ? goodsellColor : endColor;
 
-	//		 float h = ingredientGroupsColorValues.x + (ingredientGroupsColorRanges.x) * (proteinRandomValues.x - 0.5f) * ingredientGroupsLerpFactors;
-	//	 	 float c = ingredientGroupsColorValues.y + (ingredientGroupsColorRanges.y) * (proteinRandomValues.x - 0.5f) * ingredientGroupsLerpFactors;
-	//		 float l = ingredientGroupsColorValues.z + (ingredientGroupsColorRanges.z) * (proteinRandomValues.x - 0.5f) * ingredientGroupsLerpFactors;
+				beginColor = (level == 1) ? goodsellColor : beginColor;
+				endColor = (level == 1) ? proteinIngredientsChainColor : endColor;
+
+				beginColor = (level == 2) ? proteinIngredientsChainColor : beginColor;
+				endColor = (level == 2) ? proteinIngredientsColor : endColor;
 			
-			color = float4(d3_hcl_lab(hclMelded.x, hclMelded.y, hclMelded.z), 1);
-		
+				beginColor = (level == 3) ? proteinIngredientsColor : beginColor;
+				endColor = (level == 3) ? ingredientGroupColor : endColor;
+
+				beginColor = (level == 4) ? ingredientGroupColor : beginColor;
+				endColor = (level == 4) ? ingredientGroupColor : endColor;
+			
+				color = lerp(beginColor, endColor, lerpFactor);
+				return;
+			}
+			else if(colorChoice == 2)
+			{
+				//ingredientgroupcolor is of type color in C#, so i needed to rescale, kind of a hack. Should eventually be changed to vector.
+				ingredientGroupColor.x = ingredientGroupColor.x * 360;
+				ingredientGroupColor.y = ingredientGroupColor.y * 100;
+				ingredientGroupColor.z = ingredientGroupColor.z * 100;
+									
+				////*******//
+				//test compartment color
+				float h = proteinIngredientsColor.x;
+				float c = proteinIngredientsColor.y;
+				float l = proteinIngredientsChainColor.z;
+
+				float4 luminances;
+				luminances[0] = ingredientGroupColor.z;
+				luminances[1] = proteinIngredientsColor.z;
+				luminances[2] = proteinIngredientsChainColor.z;
+				luminances[3] = 70;
+				float4x2 HCs = float4x2(ingredientGroupColor.xy, proteinIngredientsColor.xy, proteinIngredientsChainColor.xy, atomColor.xy);
+			
+				//tbd, temporary replacement because atomcolor is rgb
+				HCs[3][0] = 100;
+				HCs[3][1] =70;
+
+	    		float3 hclMelded = getDepthLuminanceManuFormula(_depth , luminances, HCs);
+				//tbd, temporary replacement because atomcolor is rgb
+				//		HCs[3][0] = 100;
+				//		HCs[3][1] =50;
+							
+				color = float4(d3_hcl_lab(hclMelded.x, hclMelded.y, hclMelded.z), 1);
+			}
+			else if(colorChoice == 3)
+			{
+			
+				float3 proteinRandomValues = _ProteinIngredientsRandomValues[proteinInstanceInfo.proteinIngredientType].xyz;
+				float ingredientGroupsLerpFactors = _IngredientGroupsLerpFactors[proteinIngredientInfo.proteinIngredientGroupId];
+				float3 ingredientGroupsColorValues = _IngredientGroupsColorValues[proteinIngredientInfo.proteinIngredientGroupId].xyz;
+				float3 ingredientGroupsColorRanges = _IngredientGroupsColorRanges[proteinIngredientInfo.proteinIngredientGroupId].xyz;
+
+				float h = ingredientGroupsColorValues.x + (ingredientGroupsColorRanges.x) * (proteinRandomValues.x - 0.5f) * ingredientGroupsLerpFactors;
+				float c = ingredientGroupsColorValues.y + (ingredientGroupsColorRanges.y) * (proteinRandomValues.x - 0.5f) * ingredientGroupsLerpFactors;
+				float l = ingredientGroupsColorValues.z + (ingredientGroupsColorRanges.z) * (proteinRandomValues.x - 0.5f) * ingredientGroupsLerpFactors;
+
+				color = float4(d3_hcl_lab(h, c, l), 1);
+			}		
 		}
 		else
 		{

@@ -30,9 +30,8 @@ public class ColorManagerInspector : Editor
             GPUBuffers.Get.IngredientsColors.SetData(CPUBuffers.Get.IngredientsColors.ToArray());
         }
 
-        return;
-
         DrawDefaultInspector();
+
         var colorManager = (ColorManager)target;
         
         if (foldouts == null || foldouts.Length != CPUBuffers.Get.IngredientGroupsColorRanges.Count)
