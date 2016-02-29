@@ -42,6 +42,10 @@ public class ColorManager : MonoBehaviour
         }
     }
 
+    [HideInInspector] public bool UseHCL;
+    [HideInInspector] public bool ShowAtoms;
+    [HideInInspector] public bool ShowChains;
+
     //*******//
 
     public int NumLevelMax;
@@ -58,17 +62,20 @@ public class ColorManager : MonoBehaviour
 
     [HideInInspector]
     public float[] LevelRanges = new float[0];
+    
 
     //*******//
 
     public void InitColors()
     {
-        CPUBuffers.Get.ProteinIngredientsProperties.Clear();
+        CPUBuffers.Get.IngredientsInfo.Clear();
+        CPUBuffers.Get.IngredientsDisplayInfo.Clear();
+        CPUBuffers.Get.IngredientGroupsDisplayInfo.Clear();
 
         // Predefined colors
 
-        CPUBuffers.Get.IngredientGroupsColor.Clear();
         CPUBuffers.Get.IngredientsColors.Clear();
+        CPUBuffers.Get.IngredientGroupsColor.Clear();
         CPUBuffers.Get.ProteinIngredientsChainColors.Clear();
 
         var tempIngredientsColors = new Vector4[SceneManager.Get.NumAllIngredients];
@@ -83,7 +90,7 @@ public class ColorManager : MonoBehaviour
 
         foreach (var group in SceneManager.Get.IngredientGroups)
         {
-            CPUBuffers.Get.IngredientGroupsColorInfo.Add(new Vector4(group.NumIngredients, 0, 0, 0));
+            CPUBuffers.Get.IngredientGroupsDisplayInfo.Add(new DisplayInfo(group.NumIngredients, 0, 0, 0));
 
             var currentHue = _hueShifts[group.unique_id] * 360.0f;
 
@@ -106,11 +113,11 @@ public class ColorManager : MonoBehaviour
                     throw new Exception("Unknown ingredient: " + group.Ingredients[i].path);
                 }
 
-                CPUBuffers.Get.ProteinIngredientsColorInfo.Add(new Vector4(group.Ingredients[i].nbMol, 0, 0, 0));
+                CPUBuffers.Get.IngredientsDisplayInfo.Add(new DisplayInfo(group.Ingredients[i].nbMol, 0, 0, 0));
 
                 var currentChroma = Random.Range(0.5f, 1);
 
-                CPUBuffers.Get.ProteinIngredientsProperties.Add(new Vector4(group.unique_id, group.Ingredients[i].nbChains, CPUBuffers.Get.ProteinIngredientsChainColors.Count, 0));
+                CPUBuffers.Get.IngredientsInfo.Add(new Vector4(group.unique_id, group.Ingredients[i].nbChains, CPUBuffers.Get.ProteinIngredientsChainColors.Count, 0));
 
                 // Predefined ingredient color
                 CPUBuffers.Get.IngredientsColors.Add(MyUtility.ColorFromHSV(currentHue, currentChroma, 1));
@@ -169,7 +176,7 @@ public class ColorManager : MonoBehaviour
             }
         }
 
-        CPUBuffers.Get.ProteinIngredientsProperties = tempIngredientsInfo.ToList();
+        CPUBuffers.Get.IngredientsInfo = tempIngredientsInfo.ToList();
         CPUBuffers.Get.IngredientGroupsColor = tempIngredientGroupColor.ToList();
         CPUBuffers.Get.IngredientsColors = tempIngredientsColors.ToList();
         CPUBuffers.Get.ProteinIngredientsChainColors = tempIngredientsChainColors.ToList();
@@ -358,5 +365,18 @@ public class ColorManager : MonoBehaviour
 
         var str = JsonConvert.SerializeObject(currentPalette);
         File.WriteAllText(path, str);
+    }
+
+    public void UpdateColors(int[] groupIndices, float[] wedgeAngles, float[] wedgeRadii)
+    {
+        for (int i = 0; i < SceneManager.Get.IngredientGroups.Count; i++)
+        {
+            var index = groupIndices[i];
+            CPUBuffers.Get.IngredientGroupsColorValues[index] = new Vector4(wedgeAngles[i], 75, 75);
+            CPUBuffers.Get.IngredientGroupsColorRanges[index] = new Vector4(wedgeRadii[i], 0, 0);
+        }
+
+        GPUBuffers.Get.IngredientGroupsColorValues.SetData(CPUBuffers.Get.IngredientGroupsColorValues.ToArray());
+        GPUBuffers.Get.IngredientGroupsColorRanges.SetData(CPUBuffers.Get.IngredientGroupsColorRanges.ToArray());
     }
 }

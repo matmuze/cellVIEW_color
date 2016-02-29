@@ -23,7 +23,7 @@ public class GlobalProperties : MonoBehaviour
             return _instance;
         }
     }
-
+    
     //*********************************//
 
     public string LastSceneLoaded;

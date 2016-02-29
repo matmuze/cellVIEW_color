@@ -99,10 +99,10 @@ public class GPUBuffers : MonoBehaviour
 
     // Colors
 
+    public ComputeBuffer IngredientsColorInfo;
     public ComputeBuffer IngredientGroupsColorInfo;
-    public ComputeBuffer ProteinIngredientsColorInfo;
 
-    public ComputeBuffer ProteinIngredientsInfo;
+    public ComputeBuffer IngredientsInfo;
     public ComputeBuffer IngredientGroupsColor;
     public ComputeBuffer IngredientsColors;
     public ComputeBuffer IngredientsChainColors;
@@ -216,11 +216,11 @@ public class GPUBuffers : MonoBehaviour
         if (AminoAcidColors == null) AminoAcidColors = new ComputeBuffer(32, 16);
         if (IngredientsColors == null) IngredientsColors = new ComputeBuffer(NumProteinTypeMax, 16);
         if (IngredientGroupsColor == null) IngredientGroupsColor = new ComputeBuffer(16, 16);
-        if (ProteinIngredientsInfo == null) ProteinIngredientsInfo = new ComputeBuffer(NumIngredientMax, 16);
+        if (IngredientsInfo == null) IngredientsInfo = new ComputeBuffer(NumIngredientMax, 16);
         if (IngredientsChainColors == null) IngredientsChainColors = new ComputeBuffer(NumIngredientMax * 16, 16);
 
         if (IngredientGroupsColorInfo == null) IngredientGroupsColorInfo = new ComputeBuffer(16, 16);
-        if (ProteinIngredientsColorInfo == null) ProteinIngredientsColorInfo = new ComputeBuffer(NumIngredientMax, 16);
+        if (IngredientsColorInfo == null) IngredientsColorInfo = new ComputeBuffer(NumIngredientMax, 16);
 
         if (IngredientGroupsLerpFactors == null) IngredientGroupsLerpFactors = new ComputeBuffer(16, 4);
         if (IngredientGroupsColorRanges == null) IngredientGroupsColorRanges = new ComputeBuffer(16, 16);

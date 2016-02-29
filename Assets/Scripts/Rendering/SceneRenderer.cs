@@ -553,7 +553,7 @@ public class SceneRenderer : MonoBehaviour
     //    //    //ColorCompositeMaterial.SetBuffer("_AminoAcidColors", GPUBuffers.Get.AminoAcidColors);
     //    //    //ColorCompositeMaterial.SetBuffer("_ProteinAtomInfos", GPUBuffers.Get.ProteinAtomInfo);
     //    //    //ColorCompositeMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
-    //    //    //ColorCompositeMaterial.SetBuffer("_IngredientProperties", GPUBuffers.Get.ProteinIngredientsInfo);
+    //    //    //ColorCompositeMaterial.SetBuffer("_IngredientProperties", GPUBuffers.Get.IngredientsInfo);
     //    //    //ColorCompositeMaterial.SetBuffer("_IngredientGroupsColor", GPUBuffers.Get.IngredientGroupsColor);
 
     //    //    ///********/
@@ -670,6 +670,8 @@ public class SceneRenderer : MonoBehaviour
         //Graphics.Blit(null, colorBuffer, CompositeMaterial, 3);
 
         //Compute color composition
+        ColorCompositeUtils.ComputeCoverage(instanceIdBuffer);
+        ColorCompositeUtils.CountInstances();
         ColorCompositeUtils.ComputeColorComposition(ColorCompositeMaterial, colorBuffer, instanceIdBuffer, atomIdBuffer, depthBuffer);
 
         // Compute contours detection

@@ -557,7 +557,7 @@ public class SceneManager : MonoBehaviour
                 if (breakAfterFlushing) break;
             }
 
-            var currentAtom = new Vector4(membraneData[dataIndex], membraneData[dataIndex + 1], membraneData[dataIndex + 2], AtomHelper.AtomRadii[(int)membraneData[dataIndex + 3]]);
+            var currentAtom = new Vector4(membraneData[dataIndex], membraneData[dataIndex + 1], membraneData[dataIndex + 2], membraneData[dataIndex + 3]);
             currentLipidAtoms.Add(currentAtom);
             dataIndex += step;
         }

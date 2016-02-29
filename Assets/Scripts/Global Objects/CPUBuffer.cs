@@ -98,10 +98,13 @@ public class CPUBuffers : MonoBehaviour
 
     // Color
 
+    [HideInInspector]
+    public List<DisplayInfo> IngredientsDisplayInfo = new List<DisplayInfo>();
 
     [HideInInspector]
-    public List<Vector4> IngredientGroupsColorInfo = new List<Vector4>();
-    public List<Vector4> ProteinIngredientsColorInfo = new List<Vector4>();
+    public List<DisplayInfo> IngredientGroupsDisplayInfo = new List<DisplayInfo>();
+
+
 
 
     [HideInInspector]
@@ -110,7 +113,7 @@ public class CPUBuffers : MonoBehaviour
     [HideInInspector]
     public List<Vector4> IngredientsColors = new List<Vector4>();
     [HideInInspector]
-    public List<Vector4> ProteinIngredientsProperties = new List<Vector4>();
+    public List<Vector4> IngredientsInfo = new List<Vector4>();
     [HideInInspector]
     public List<Color> IngredientGroupsColor = new List<Color>();
 
@@ -230,12 +233,18 @@ public class CPUBuffers : MonoBehaviour
         var initArgs = new[] {0, 1, 0, 0};
         GPUBuffers.Get.ArgBuffer.SetData(initArgs);
 
+        for (var i = 0; i < AtomHelper.AtomColors.Length; i++)
+        {
+           var c = AtomHelper.AtomColors[i];
+           AtomHelper.AtomColors[i] = new Color(c.r, c.g, c.b, AtomHelper.AtomRadii[i]);
+        }
+
         GPUBuffers.Get.AtomColors.SetData(AtomHelper.AtomColors);
         GPUBuffers.Get.AminoAcidColors.SetData(AtomHelper.ResidueColors);
         GPUBuffers.Get.IngredientsColors.SetData(CPUBuffers.Get.IngredientsColors.ToArray());
         GPUBuffers.Get.IngredientsChainColors.SetData(CPUBuffers.Get.ProteinIngredientsChainColors.ToArray());
         GPUBuffers.Get.ProteinAtomInfo.SetData(CPUBuffers.Get.ProteinAtomInfo.ToArray());
-        GPUBuffers.Get.ProteinIngredientsInfo.SetData(CPUBuffers.Get.ProteinIngredientsProperties.ToArray());
+        GPUBuffers.Get.IngredientsInfo.SetData(CPUBuffers.Get.IngredientsInfo.ToArray());
         GPUBuffers.Get.IngredientGroupsColor.SetData(CPUBuffers.Get.IngredientGroupsColor.ToArray());
 
         //*****//

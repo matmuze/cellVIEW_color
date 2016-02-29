@@ -1,41 +1,122 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+
+[Serializable]
+public struct DisplayInfo
+{
+    public int a;
+    public int b;
+    public int c;
+    public int d;
+
+    public DisplayInfo(int _a, int _b, int _c, int _d)
+    {
+        a = _a;
+        b = _b;
+        c = _c;
+        d = _d;
+    }
+
+    public string ToString()
+    {
+        return "a: " + a + " - b: " + b + " - c: " + c + " - d: " + d;
+    }
+}
+
+
 
 public static class ColorCompositeUtils
 {
     public static void ComputeCoverage(RenderTexture instanceIdBuffer)
     {
-        GPUBuffers.Get.IngredientGroupsColorInfo.SetData(CPUBuffers.Get.IngredientGroupsColorInfo.ToArray());
-        GPUBuffers.Get.ProteinIngredientsColorInfo.SetData(CPUBuffers.Get.ProteinIngredientsColorInfo.ToArray());
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(3, "_ClearBuffer", GPUBuffers.Get.LipidInstanceVisibilityFlags);
+        ComputeShaderManager.Get.ComputeColorInfo.Dispatch(3, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
+
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(3, "_ClearBuffer", GPUBuffers.Get.ProteinInstanceVisibilityFlags);
+        ComputeShaderManager.Get.ComputeColorInfo.Dispatch(3, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
+        
+        //**************************************************//
+
+        for (var i = 0; i < CPUBuffers.Get.IngredientsDisplayInfo.Count; i++)
+        {
+            CPUBuffers.Get.IngredientsDisplayInfo[i] = new DisplayInfo(CPUBuffers.Get.IngredientsDisplayInfo[i].a, 0, 0, 0);
+        }
+
+        for (var j = 0; j < CPUBuffers.Get.IngredientGroupsDisplayInfo.Count; j++)
+        {
+            CPUBuffers.Get.IngredientGroupsDisplayInfo[j] = new DisplayInfo(CPUBuffers.Get.IngredientGroupsDisplayInfo[j].a, 0, 0, 0);
+        }
+
+        //*************************************************//
+
+        GPUBuffers.Get.IngredientsColorInfo.SetData(CPUBuffers.Get.IngredientsDisplayInfo.ToArray());
+        GPUBuffers.Get.IngredientGroupsColorInfo.SetData(CPUBuffers.Get.IngredientGroupsDisplayInfo.ToArray());
+
+        ComputeShaderManager.Get.ComputeColorInfo.SetInt("_Width", instanceIdBuffer.width);
+        ComputeShaderManager.Get.ComputeColorInfo.SetInt("_Height", instanceIdBuffer.height);
 
         ComputeShaderManager.Get.ComputeColorInfo.SetTexture(0, "_InstanceIdBuffer", instanceIdBuffer);
-
+        
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(0, "_IngredientsInfo", GPUBuffers.Get.IngredientsInfo);
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(0, "_LipidInstancesInfo", GPUBuffers.Get.LipidInstancesInfo);
         ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(0, "_ProteinInstancesInfo", GPUBuffers.Get.ProteinInstancesInfo);
-        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(0, "_ProteinIngredientsInfo", GPUBuffers.Get.ProteinIngredientsInfo);
 
-        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(0, "_RWProteinInstanceVisibilityFlags", GPUBuffers.Get.ProteinInstanceVisibilityFlags);
-        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(0, "_RWIngredientGroupsColorInfo", GPUBuffers.Get.IngredientGroupsColorInfo);
-        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(0, "_RWProteinIngredientsColorInfo", GPUBuffers.Get.ProteinIngredientsColorInfo);
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(0, "_RWIngredientsDisplayInfo", GPUBuffers.Get.IngredientsColorInfo);
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(0, "_RWIngredientGroupsDisplayInfo", GPUBuffers.Get.IngredientGroupsColorInfo);
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(0, "_RWLipidInstancesVisibilityFlags", GPUBuffers.Get.LipidInstanceVisibilityFlags);
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(0, "_RWProteinInstancesVisibilityFlags", GPUBuffers.Get.ProteinInstanceVisibilityFlags);
 
         ComputeShaderManager.Get.ComputeColorInfo.Dispatch(0, Mathf.CeilToInt(instanceIdBuffer.width / 8.0f), Mathf.CeilToInt(instanceIdBuffer.height / 8.0f), 1);
     }
 
     public static void CountInstances()
     {
-        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(1, "_ProteinInstancesInfo", GPUBuffers.Get.ProteinInstancesInfo);
-        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(1, "_ProteinIngredientsInfo", GPUBuffers.Get.ProteinIngredientsInfo);
 
-        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(1, "_RWProteinInstanceVisibilityFlags", GPUBuffers.Get.ProteinInstanceVisibilityFlags);
-        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(1, "_RWIngredientGroupsColorInfo", GPUBuffers.Get.IngredientGroupsColorInfo);
-        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(1, "_RWProteinIngredientsColorInfo", GPUBuffers.Get.ProteinIngredientsColorInfo);
+        ComputeShaderManager.Get.ComputeColorInfo.SetInt("_NumInstances", SceneManager.Get.NumProteinInstances);
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(1, "_IngredientsInfo", GPUBuffers.Get.IngredientsInfo);
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(1, "_ProteinInstancesInfo", GPUBuffers.Get.ProteinInstancesInfo);
+        
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(1, "_RWIngredientsDisplayInfo", GPUBuffers.Get.IngredientsColorInfo);
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(1, "_RWIngredientGroupsDisplayInfo", GPUBuffers.Get.IngredientGroupsColorInfo);
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(1, "_RWProteinInstancesVisibilityFlags", GPUBuffers.Get.ProteinInstanceVisibilityFlags);
 
         ComputeShaderManager.Get.ComputeColorInfo.Dispatch(1, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
+
+        //***********************//
+
+        ComputeShaderManager.Get.ComputeColorInfo.SetInt("_NumInstances", SceneManager.Get.NumLipidInstances);
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(2, "_IngredientsInfo", GPUBuffers.Get.IngredientsInfo);
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(2, "_LipidInstancesInfo", GPUBuffers.Get.LipidInstancesInfo);
+
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(2, "_RWIngredientsDisplayInfo", GPUBuffers.Get.IngredientsColorInfo);
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(2, "_RWIngredientGroupsDisplayInfo", GPUBuffers.Get.IngredientGroupsColorInfo);
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(2, "_RWLipidInstancesVisibilityFlags", GPUBuffers.Get.LipidInstanceVisibilityFlags);
+
+        ComputeShaderManager.Get.ComputeColorInfo.Dispatch(2, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
     }
 
     public static void ComputeColorComposition(Material colorCompositeMaterial, RenderTexture dst, RenderTexture instanceIdBuffer, RenderTexture atomIdBuffer, RenderTexture depthBuffer)
     {
-		colorCompositeMaterial.SetFloat("_depth", ColorManager.Get.depthSlider);
+        var temp1 = new DisplayInfo[CPUBuffers.Get.IngredientsDisplayInfo.Count];
+        var temp2 = new DisplayInfo[CPUBuffers.Get.IngredientGroupsDisplayInfo.Count];
+
+        GPUBuffers.Get.IngredientsColorInfo.GetData(temp1);
+        GPUBuffers.Get.IngredientGroupsColorInfo.GetData(temp2);
+
+        CPUBuffers.Get.IngredientsDisplayInfo = temp1.ToList();
+        CPUBuffers.Get.IngredientGroupsDisplayInfo = temp2.ToList();
+
+        //Debug.Log(temp2[5].ToString());
+
+        /**************/
+
+        colorCompositeMaterial.SetFloat("_depth", ColorManager.Get.depthSlider);
+        colorCompositeMaterial.SetFloat("_UseHCL", Convert.ToInt32(ColorManager.Get.UseHCL));
+        colorCompositeMaterial.SetFloat("_ShowAtoms", Convert.ToInt32(ColorManager.Get.ShowAtoms));
+        colorCompositeMaterial.SetFloat("_ShowChains", Convert.ToInt32(ColorManager.Get.ShowChains));
 		
         // LOD infos
 
@@ -70,9 +151,9 @@ public static class ColorCompositeUtils
         colorCompositeMaterial.SetBuffer("_LipidAtomInfos", GPUBuffers.Get.LipidAtomPositions);
         colorCompositeMaterial.SetBuffer("_LipidInstancesInfo", GPUBuffers.Get.LipidInstancesInfo);
 
-        colorCompositeMaterial.SetBuffer("_IngredientsInfo", GPUBuffers.Get.ProteinIngredientsInfo);
+        colorCompositeMaterial.SetBuffer("_IngredientsInfo", GPUBuffers.Get.IngredientsInfo);
         colorCompositeMaterial.SetBuffer("_IngredientGroupsColorInfo", GPUBuffers.Get.IngredientGroupsColorInfo);
-        colorCompositeMaterial.SetBuffer("_ProteinIngredientsColorInfo", GPUBuffers.Get.ProteinIngredientsColorInfo);
+        colorCompositeMaterial.SetBuffer("_ProteinIngredientsColorInfo", GPUBuffers.Get.IngredientsColorInfo);
 
         // Predifined colors 
         colorCompositeMaterial.SetBuffer("_AtomColors", GPUBuffers.Get.AtomColors);

@@ -1,63 +1,107 @@
 ﻿#include "Helper.cginc" 
 
-// Each #kernel tells which function to compile; you can have many kernels
-//#pragma kernel ClearBuffer
 #pragma kernel ComputeCoverage
+#pragma kernel CountProteinInstances
+#pragma kernel CountLipidInstances
+#pragma kernel ClearVisibilityFlags
 
-#pragma kernel CountInstances
+int _Width;
+int _Height;
+int _NumInstances;
 
-uniform Texture2D<int> _InstanceIdBuffer;
+Texture2D<int> _InstanceIdBuffer;
 
-StructuredBuffer<ProteinInstanceInfo> _ProteinInstancesInfo;
-StructuredBuffer<ProteinIngredientInfo> _ProteinIngredientsInfo;
+StructuredBuffer<float4> _IngredientsInfo;
+StructuredBuffer<float4> _LipidInstancesInfo;
+StructuredBuffer<float4> _ProteinInstancesInfo;
 
-RWStructuredBuffer<int> _RWProteinInstanceVisibilityFlags;
-RWStructuredBuffer<IngredientGroupColorInfo> _RWIngredientGroupsColorInfo;
-RWStructuredBuffer<ProteinIngredientColorInfo> _RWProteinIngredientsColorInfo;
+RWStructuredBuffer<int4> _RWIngredientsDisplayInfo;
+RWStructuredBuffer<int4> _RWIngredientGroupsDisplayInfo;
+
+RWStructuredBuffer<int> _RWLipidInstancesVisibilityFlags;
+RWStructuredBuffer<int> _RWProteinInstancesVisibilityFlags;
+
+//**********************************//
+
+RWStructuredBuffer<int> _ClearBuffer;
+
+[numthreads(64,1,1)]
+void ClearVisibilityFlags (uint3 id : SV_DispatchThreadID)
+{
+	if(id.x >= _NumInstances) return;
+	_ClearBuffer[id.x] = 0;
+}
 
 [numthreads(8,8,1)]
 void ComputeCoverage (uint3 id : SV_DispatchThreadID)
 {
-	// We have have thead per pixel
-
-	// Fetch the instance id from the current pixel
+	if(id.x >= _Width || id.y >= _Height) return;
 	int instanceId = _InstanceIdBuffer[id.xy];
 
 	if(instanceId < 0) return;
 
-	ProteinInstanceInfo proteinInstanceInfo = _ProteinInstancesInfo[instanceId];
-	ProteinIngredientInfo proteinIngredientInfo = _ProteinIngredientsInfo[proteinInstanceInfo.proteinIngredientType];
+	if (instanceId >= 100000)
+	{
+		int lipidInstanceId = instanceId - 100000;
+		float4 instanceInfo = _LipidInstancesInfo[lipidInstanceId];
+		float4 ingredientInfo = _IngredientsInfo[instanceInfo.x];
 
-	// Set the instance visibility flag for the current pixel
-	_RWProteinInstanceVisibilityFlags[instanceId] = 1;
+		_RWLipidInstancesVisibilityFlags[lipidInstanceId] = 1;
 
-	// Increase screen coverage for the ingredient type which corresponds the instance
-	InterlockedAdd(_RWProteinIngredientsColorInfo[proteinInstanceInfo.proteinIngredientType].screenCoverage, 1);
+		InterlockedAdd(_RWIngredientsDisplayInfo[instanceInfo.x].z, 1);
+		InterlockedAdd(_RWIngredientGroupsDisplayInfo[ingredientInfo.x].z, 1);
+	}
+	else
+	{
+		int proteinInstanceId = instanceId;
+		float4 instanceInfo = _ProteinInstancesInfo[proteinInstanceId];
+		float4 ingredientInfo = _IngredientsInfo[instanceInfo.x];
 
-	// Increase screen coverage for the ingredient group which corresponds the instance
-	InterlockedAdd(_RWIngredientGroupsColorInfo[proteinIngredientInfo.proteinIngredientGroupId].screenCoverage, 1);
+		_RWProteinInstancesVisibilityFlags[proteinInstanceId] = 1;
+		InterlockedAdd(_RWIngredientsDisplayInfo[instanceInfo.x].z, 1);
+		InterlockedAdd(_RWIngredientGroupsDisplayInfo[ingredientInfo.x].z, 1);
+	}		
 }
 
-[numthreads(8,8,1)]
-void CountInstances (uint3 id : SV_DispatchThreadID)
+[numthreads(64,1,1)]
+void CountProteinInstances (uint3 id : SV_DispatchThreadID)
 {
-	// We have one thread per instance	
-
-	ProteinInstanceInfo proteinInstanceInfo = _ProteinInstancesInfo[id.x];
-	ProteinIngredientInfo proteinIngredientInfo = _ProteinIngredientsInfo[proteinInstanceInfo.proteinIngredientType];
+	if(id.x >= _NumInstances) return;
+	
+	float4 instanceInfo = _ProteinInstancesInfo[id.x];
+	float4 ingredientInfo = _IngredientsInfo[instanceInfo.x];
 
 	// Fetch visibilty flag for the current instance
-	int visibilityFlag = _RWProteinInstanceVisibilityFlags[id.x];
+	int visibilityFlag = _RWProteinInstancesVisibilityFlags[id.x];
 
 	// If the current instance is visible...
 	if(visibilityFlag == 1)
+	//if(true)
 	{
-		// Increase visible instances counter for the ingredient type
-		InterlockedAdd(_RWProteinIngredientsColorInfo[proteinInstanceInfo.proteinIngredientType].numProteinInstancesVisible, 1);
-
-		// Increase visible instances counter for the ingredient group
-		InterlockedAdd(_RWIngredientGroupsColorInfo[proteinIngredientInfo.proteinIngredientGroupId].numProteinInstancesVisible, 1);	
+		InterlockedAdd(_RWIngredientsDisplayInfo[instanceInfo.x].y, 1);
+		InterlockedAdd(_RWIngredientGroupsDisplayInfo[ingredientInfo.x].y, 1);
 	}
-
-	_RWProteinInstanceVisibilityFlags[id.x] = 0;
 }
+
+[numthreads(64,1,1)]
+void CountLipidInstances (uint3 id : SV_DispatchThreadID)
+{
+	if(id.x >= _NumInstances) return;
+	
+	float4 instanceInfo = _LipidInstancesInfo[id.x];
+	float4 ingredientInfo = _IngredientsInfo[instanceInfo.x];
+
+	// Fetch visibilty flag for the current instance
+	int visibilityFlag = _RWLipidInstancesVisibilityFlags[id.x];
+
+	// If the current instance is visible...
+	if(visibilityFlag == 1)
+	//if(true)
+	{
+		InterlockedAdd(_RWIngredientsDisplayInfo[instanceInfo.x].y, 1);
+		InterlockedAdd(_RWIngredientGroupsDisplayInfo[ingredientInfo.x].y, 1);
+	}
+}
+
+
+

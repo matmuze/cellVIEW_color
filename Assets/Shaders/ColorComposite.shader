@@ -6,90 +6,14 @@
 	}
 		
 	CGINCLUDE
-// Upgrade NOTE: excluded shader from OpenGL ES 2.0 because it uses non-square matrices
-#pragma exclude_renderers gles
+
+	// Upgrade NOTE: excluded shader from OpenGL ES 2.0 because it uses non-square matrices
+	#pragma exclude_renderers gles
 
 	#include "UnityCG.cginc"
 	#include "Helper.cginc"
 
-	float3 Hue(float H)
-	{
-		float R = abs(H * 6 - 3) - 1;
-		float G = 2 - abs(H * 6 - 2);
-		float B = 2 - abs(H * 6 - 4);
-		return saturate(float3(R, G, B));
-	}
-
-	float3 HSVtoRGB_(in float3 HSV)
-	{
-		return ((Hue(HSV.x) - 1) * HSV.y + 1) * HSV.z;
-	}
-
-	float3 GetUniqueColor(int id, int total)
-	{
-		float hue = (1.0f / total) * id;
-		return HSVtoRGB_(float3(hue, 1, 1));
-	}
-
-	float d3_lab_xyz(float x)
-	{
-		return x > 0.206893034 ? x * x * x : (x - 4.0 / 29.0) / 7.787037;
-	}
-
-	float d3_xyz_rgb(float r)
-	{
-		return round(255 * (r <= 0.00304 ? 12.92 * r : 1.055 * pow(r, 1.0 / 2.4) - 0.055));
-	}
-
-
-	float ab_hue(float a, float b) {
-		return atan2(b, a);
-	}
-
-	float ab_chroma(float a, float b) {
-		return sqrt(pow(a, 2) + pow(b, 2));
-	}
-
-	float2 HC_ab(float hue, float chroma) {
-		float d3_radians = 0.01745329252;
-		float a = chroma * cos(hue*d3_radians);
-		float b = chroma * sin(hue*d3_radians);
-
-		return float2( a, b); 
-	}
-
-
-	float3 d3_lab_rgb(float l, float a, float b)
-	{
-		float y = (l + 16.0) / 116.0;
-		float x = y + a / 500.0;
-		float z = y - b / 200.0;
-
-		x = d3_lab_xyz(x) * 0.950470;
-		y = d3_lab_xyz(y) * 1.0;
-		z = d3_lab_xyz(z) * 1.088830;
-
-		return float3(
-			d3_xyz_rgb(3.2404542 * x - 1.5371385 * y - 0.4985314 * z),
-			d3_xyz_rgb(-0.9692660 * x + 1.8760108 * y + 0.0415560 * z),
-			d3_xyz_rgb(0.0556434 * x - 0.2040259 * y + 1.0572252 * z)
-			);
-	}
-
-	float3 d3_hcl_lab(float h, float c, float l)
-	{
-		float d3_radians = 0.01745329252;
-
-		/*if (isNaN(h)) h = 0;
-		if (isNaN(c)) c = 0;*/
-		//return d3_lab_rgb(l, cos(h *= d3_radians) * c, sin(h) * c);
-		/*h = 50;
-		c = 50;
-		l = 50;*/
-		return d3_lab_rgb(l, cos(h * d3_radians) * c, sin(h * d3_radians) * c) / 255;
-	}
-
-
+	
 	float3 getDepthLuminanceManuFormula(float depthvalue, float4 luminances, float4x2 HCs)
 	{
 		float omega = 0.5;
@@ -155,7 +79,8 @@
 	}
 	
 	StructuredBuffer<ProteinIngredientInfo> _IngredientsInfo;
-
+	
+	StructuredBuffer<float4> _LipidAtomInfos;
 	StructuredBuffer<AtomInfo> _ProteinAtomInfos;
 	StructuredBuffer<ProteinInstanceInfo> _ProteinInstanceInfo;
 		
@@ -193,6 +118,11 @@
 	
 	uniform float4x4 _LevelRanges;
 	uniform float _LevelLerpFactor;
+
+	
+	uniform int _UseHCL;
+	uniform int _ShowAtoms;
+	uniform int _ShowChains;
 
 	uniform float _depth;
 	//*****//
@@ -240,11 +170,40 @@
 		
 		if (instanceId >= 100000)
 		{
+			float4 lipidAtomInfo = _LipidAtomInfos[atomId];
+
 			int lipidInstanceId = instanceId - 100000;
 			LipidInstanceInfo lipidInstanceInfo = _LipidInstancesInfo[lipidInstanceId];
-			float4 lipidIngredientColor = _IngredientsColors[lipidInstanceInfo.lipidIngredientType];
+			ProteinIngredientInfo lipidIngredientInfo = _IngredientsInfo[lipidInstanceInfo.type];
 
-			color = lipidIngredientColor;
+			float4 lipidIngredientColor = _IngredientsColors[lipidInstanceInfo.type];
+
+			
+			float ingredientGroupsLerpFactors = 1;
+			//float ingredientGroupsLerpFactors = _IngredientGroupsLerpFactors[lipidIngredientInfo.proteinIngredientGroupId];
+
+			float ingredientLocalIndex = _ProteinIngredientsRandomValues[lipidInstanceInfo.type].x;
+			float3 ingredientGroupsColorValues = _IngredientGroupsColorValues[lipidIngredientInfo.proteinIngredientGroupId].xyz;
+			float3 ingredientGroupsColorRanges = _IngredientGroupsColorRanges[lipidIngredientInfo.proteinIngredientGroupId].xyz;
+
+			float h = ingredientGroupsColorValues.x + (ingredientGroupsColorRanges.x) * (ingredientLocalIndex - 0.5f) * ingredientGroupsLerpFactors;
+			float c = ingredientGroupsColorValues.y + (ingredientGroupsColorRanges.y) * (ingredientLocalIndex - 0.5f) * ingredientGroupsLerpFactors;
+			float l = ingredientGroupsColorValues.z + (ingredientGroupsColorRanges.z) * (ingredientLocalIndex - 0.5f) * ingredientGroupsLerpFactors;
+
+			//color = float4(d3_hcl_lab(h, c, l), 1);
+			//color = float4(HSLtoRGB(float3((h%360)/360.0f, 0.75, 0.55)), 1);
+			//color = float4(HSVtoRGB(float3((h%360)/360.0f, 0.75f, 1.0f)), 1);
+
+			if (h >= 0)
+			{
+				h = h % 360;
+			}
+			else
+			{
+				h = 360 - abs(h) % 360;
+			}
+
+			color = (_UseHCL == 0) ? float4(HSLtoRGB(float3(h / 360.0f , 0.75, 0.55)), 1) : float4(d3_hcl_lab(h, 75, 75), 1);
 			return;
 		}
 		else if (instanceId >= 0)
@@ -263,6 +222,9 @@
 			//if((float)proteinIngredientColorInfo.screenCoverage / (float)_NumPixels < 0.25) discard;
 			//if(proteinIngredientColorInfo.numProteinInstancesVisible < 3000) discard;					
 
+			//color = float4(1,0,0,1);
+			//return;
+
 			// Predefined colors
 			float4 atomColor = _AtomColors[atomInfo.atomSymbolId];
 			float4 aminoAcidColor = _AminoAcidColors[atomInfo.residueSymbolId];
@@ -277,7 +239,7 @@
 
 			if(colorChoice == 0)
 			{
-				color = proteinIngredientsColor;
+				color = aminoAcidColor;
 				return;
 			}
 			else if(colorChoice == 1)
@@ -336,17 +298,90 @@
 			}
 			else if(colorChoice == 3)
 			{
-			
-				float3 proteinRandomValues = _ProteinIngredientsRandomValues[proteinInstanceInfo.proteinIngredientType].xyz;
-				float ingredientGroupsLerpFactors = _IngredientGroupsLerpFactors[proteinIngredientInfo.proteinIngredientGroupId];
-				float3 ingredientGroupsColorValues = _IngredientGroupsColorValues[proteinIngredientInfo.proteinIngredientGroupId].xyz;
-				float3 ingredientGroupsColorRanges = _IngredientGroupsColorRanges[proteinIngredientInfo.proteinIngredientGroupId].xyz;
+				float ingredientGroupsLerpFactor = 1;
+				//float ingredientGroupsLerpFactors = _IngredientGroupsLerpFactors[proteinIngredientInfo.proteinIngredientGroupId];
+				
+				int groupId = proteinIngredientInfo.proteinIngredientGroupId;
 
-				float h = ingredientGroupsColorValues.x + (ingredientGroupsColorRanges.x) * (proteinRandomValues.x - 0.5f) * ingredientGroupsLerpFactors;
-				float c = ingredientGroupsColorValues.y + (ingredientGroupsColorRanges.y) * (proteinRandomValues.x - 0.5f) * ingredientGroupsLerpFactors;
-				float l = ingredientGroupsColorValues.z + (ingredientGroupsColorRanges.z) * (proteinRandomValues.x - 0.5f) * ingredientGroupsLerpFactors;
+				float3 ingredientLocalIndex = _ProteinIngredientsRandomValues[proteinInstanceInfo.proteinIngredientType].x;
+				float3 ingredientGroupsColorValues = _IngredientGroupsColorValues[groupId].xyz;
+				float3 ingredientGroupsColorRanges = _IngredientGroupsColorRanges[groupId].xyz;
 
-				color = float4(d3_hcl_lab(h, c, l), 1);
+				float h = ingredientGroupsColorValues.x + (ingredientGroupsColorRanges.x) * (ingredientLocalIndex - 0.5f) * ingredientGroupsLerpFactor;
+				//float h = ingredientGroupsColorValues.x ;
+				//float c = ingredientGroupsColorValues.y + (ingredientGroupsColorRanges.y) * (ingredientLocalIndex - 0.5f) * ingredientGroupsLerpFactor;
+				//float l = ingredientGroupsColorValues.z + (ingredientGroupsColorRanges.z) * (ingredientLocalIndex - 0.5f) * ingredientGroupsLerpFactor;
+
+				//float s = 0.75f + 0.25f * (ingredientLocalIndex - 0.5f);
+				//float l = 1.0f - 0.4f * (ingredientLocalIndex);
+				//float l = 0.5f + (ingredientGroupsColorRanges.z) * (ingredientLocalIndex - 0.5f) * ingredientGroupsLerpFactor;
+
+				float c = (_UseHCL == 0) ? 0.75 : 75;
+				float l = (_UseHCL == 0) ? 0.55 : 75;
+				//float l = 0.55;
+				//float c = 75;
+				//float l = 75;
+
+				float cc = max(eyeDepth - 10, 0);
+				float dd = 30 - 10;
+
+				if(eyeDepth < 30)
+				{
+					if(_ShowAtoms)
+					{
+						//c = (atomInfo.atomSymbolId == 0) ? c : c * (0.5 + 0.5 * (eyeDepth/40.0f));
+						l = (atomInfo.atomSymbolId == 0) ? l : l * (0.85 + 0.15 * (eyeDepth/30.0f));
+						//c = (atomInfo.atomSymbolId == 0) ? c : c * (1 + 0.25 * (eyeDepth/40.0f));
+					}
+				}				
+
+				if(eyeDepth < 40 && proteinIngredientInfo.numChains > 1)
+				{
+					float cc = max(eyeDepth - 10, 0);
+					float dd = 40 - 10;
+
+					float hueShift = 35;
+					hueShift = proteinIngredientInfo.numChains >= 3 ? 30 : hueShift;
+					hueShift = proteinIngredientInfo.numChains >= 4 ? 30 : hueShift;
+					hueShift = proteinIngredientInfo.numChains >= 5 ? 30 : hueShift;
+					hueShift = proteinIngredientInfo.numChains >= 6 ? 15 : hueShift;		
+					hueShift = proteinIngredientInfo.numChains >= 7 ? 25 : hueShift;		
+					hueShift = proteinIngredientInfo.numChains >= 8 ? 30 : hueShift;		
+					hueShift = proteinIngredientInfo.numChains >= 9 ? 30 : hueShift;		
+					hueShift = proteinIngredientInfo.numChains >= 10 ? 15 : hueShift;		
+					hueShift = proteinIngredientInfo.numChains >= 11 ? 5 : hueShift;		
+					hueShift = proteinIngredientInfo.numChains >= 12 ? 5 : hueShift;		
+					hueShift *= (1-(cc/dd));
+										
+					float hueLength = hueShift * (proteinIngredientInfo.numChains - 1);
+					float hueOffset = hueLength * 0.5;
+					if(_ShowChains) h -=  hueOffset + (atomInfo.chainSymbolId * hueShift);	
+					
+					
+					
+					//
+					
+					//float chromaShift = (25 / (proteinIngredientInfo.numChains * 0.3)) * (1-(eyeDepth/40.0f)) ;
+					//float chromaOffset = proteinIngredientInfo.numChains * 0.5 * chromaShift;
+					//c +=  chromaOffset - (atomInfo.chainSymbolId * chromaShift);
+					
+					//float lumaShift = (25 / (proteinIngredientInfo.numChains * 0.3)) * (1-(eyeDepth/40.0f)) ;
+					//float lumaOffset = proteinIngredientInfo.numChains * 0.5 * lumaShift;
+					//l +=  lumaOffset - (atomInfo.chainSymbolId * lumaShift);					 
+				}
+				
+				if (h >= 0)
+				{
+					h = h % 360;
+				}
+				else
+				{
+					h = 360 - abs(h) % 360;
+				}
+				
+				color = (_UseHCL == 0) ? float4(HSLtoRGB(float3(h / 360.0f , c, l)), 1) : float4(d3_hcl_lab(h, c, l), 1);
+
+				
 			}		
 		}
 		else

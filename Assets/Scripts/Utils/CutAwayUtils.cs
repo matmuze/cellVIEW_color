@@ -53,7 +53,7 @@ public static class CutAwayUtils
 
         // Cutaways params
         ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetInt("_WeightThreshold", WeightThreshold);
-        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(0, "_IngredientProperties", GPUBuffers.Get.ProteinIngredientsInfo);
+        ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetBuffer(0, "_IngredientProperties", GPUBuffers.Get.IngredientsInfo);
 
 
         ComputeShaderManager.Get.ObjectSpaceCutAwaysCS.SetInt("_NumCutObjects", SceneManager.Get.NumCutObjects);

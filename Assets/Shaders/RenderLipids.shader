@@ -69,6 +69,7 @@
 	struct ds2gs
 	{
 		int id : INT0;		
+		int atomId : INT3;		
 		int type : INT1;
 		int state : INT2;								
 		float radius : FLOAT0;	
@@ -77,6 +78,11 @@
 		float3 color : FLOAT31;		
 	};	
 
+	static const float atomsRadius[7] =
+	{
+		1.548f, 1.100f, 1.400f, 1.348f, 1.880f, 1.808f, 1.5f
+	};
+
 	[domain("isoline")]
 	void ds_lipid(hsConst input, const OutputPatch<vs2ds, 1> op, float2 uv : SV_DomainLocation, out ds2gs output)
 	{
@@ -84,21 +90,25 @@
 		int y = round(uv.x * input.tessFactor[0]);		
 		int sphereId = x + y * input.tessFactor[0];	
 		int sphereIndex = sphereId * op[0].decimationFactor;		
-						
-		float4 atom = _LipidAtomPositions[op[0].sphereStart + sphereIndex] * _Scale;			
-		atom.xyz += op[0].pos;
+							
+		float4 atom = _LipidAtomPositions[op[0].sphereStart + sphereIndex];			
+		atom.xyz = atom.xyz * _Scale + op[0].pos;
+
+		float radius = atomsRadius[atom.w];
 
 		output.id = op[0].id;
+		output.atomId = op[0].sphereStart + sphereIndex;
 		output.type = op[0].type;
 		output.state = op[0].state;
 		output.color = op[0].color;
-		output.pos = atom.xyz;		
-		output.radius = (y >= input.tessFactor[0] || sphereId >= op[0].sphereCount) ? 0 : atom.w; 
+		output.pos = atom.xyz ;		
+		output.radius = (y >= input.tessFactor[0] || sphereId >= op[0].sphereCount) ? 0 : radius * _Scale;		
 	}
 
 	struct gs2fs
 	{
 		nointerpolation int id : INT0;	
+		nointerpolation int atomId : INT1;	
 			
 		nointerpolation float radius : FLOAT0;	
 		nointerpolation float lambertFalloff : FLOAT1;
@@ -143,6 +153,7 @@
 
 		gs2fs output;	
 		output.id = input[0].id;		
+		output.atomId = input[0].atomId;		
 		output.color = input[0].color;			
 		output.radius = input[0].radius;
 		output.lambertFalloff = 0;		
