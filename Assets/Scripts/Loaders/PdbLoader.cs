@@ -349,12 +349,9 @@ public static class PdbLoader
                 var residueIndex = int.Parse(line.Substring(22, 4));
 
                 var chain = line[21].ToString();
+                if (!chains.Contains(chain)) chains.Add(chain);
                 var chainId = chains.IndexOf(chain);
-                if (chainId < 0)
-                {
-                    chains.Add(chain);
-                    chainId = chains.IndexOf(chain);
-                }
+                
 
                 var atom = new Atom
                 {
@@ -592,13 +589,14 @@ public static class AtomHelper
         var lastChainId = -2;
         var chainCount = 0;
 
-        foreach (var atom in atoms.Where(atom => atom.chainId != lastChainId))
+        var chainList = new List<string>();
+
+        foreach (var atom in atoms)
         {
-            chainCount ++;
-            lastChainId = atom.chainId;
+            if (!chainList.Contains(atom.chain)) chainList.Add(atom.chain);
         }
 
-        return chainCount;
+        return chainList.Count;
     }
 
     public static bool IsFromCustomStructureFile(List<Atom> atoms)

@@ -150,6 +150,7 @@ public class SelectionManager : MonoBehaviour
 
         Debug.Log("Selected element id: " + instanceID); if (instanceID >= CPUBuffers.Get.ProteinInstancePositions.Count) return;
         if (instanceID > 0) Debug.Log("Selected element type: " + CPUBuffers.Get.ProteinInstanceInfos[instanceID].x);
+        if (instanceID > 0) Debug.Log("Selected element name: " + SceneManager.Get.ProteinIngredientNames[(int)CPUBuffers.Get.ProteinInstanceInfos[instanceID].x]);
         
         // If element id is different than the currently selected element
         if (_selectedObjectID != instanceID)

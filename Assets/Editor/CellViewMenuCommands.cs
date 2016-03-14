@@ -108,7 +108,7 @@ public class CellViewMenuCommands
     [MenuItem("cellVIEW/debug PDB Loader")]
     public static void ReloadCellPackResults()
     {
-        PdbLoader.LoadAtomDataFull("7aat");
+        PdbLoader.LoadAtomDataFull("1VU4CtoH_hex_manu");
     }
 
     //// Add menu item named "My Window" to the Window menu
