@@ -113,11 +113,19 @@ public static class ColorCompositeUtils
 
         /**************/
 
-        colorCompositeMaterial.SetFloat("_depth", ColorManager.Get.depthSlider);
+        //colorCompositeMaterial.SetFloat("_depth", ColorManager.Get.depthSlider);
         colorCompositeMaterial.SetFloat("_UseHCL", Convert.ToInt32(ColorManager.Get.UseHCL));
         colorCompositeMaterial.SetFloat("_ShowAtoms", Convert.ToInt32(ColorManager.Get.ShowAtoms));
         colorCompositeMaterial.SetFloat("_ShowChains", Convert.ToInt32(ColorManager.Get.ShowChains));
-		
+        colorCompositeMaterial.SetFloat("_ShowResidues", Convert.ToInt32(ColorManager.Get.ShowResidues));
+        colorCompositeMaterial.SetFloat("_ShowSecondaryStructures", Convert.ToInt32(ColorManager.Get.ShowSecondaryStructures));
+
+
+        colorCompositeMaterial.SetFloat("_AtomDistance", ColorManager.Get.AtomDistance);
+        colorCompositeMaterial.SetFloat("_ChainDistance", GlobalProperties.Get.LodLevels[0].x);
+        colorCompositeMaterial.SetFloat("_ResidueDistance", ColorManager.Get.ResidueDistance);
+        colorCompositeMaterial.SetFloat("_SecondaryStructureDistance", ColorManager.Get.SecondaryStructureDistance);
+
         // LOD infos
 
         var rangeValues = Matrix4x4.zero;

@@ -45,6 +45,12 @@ public class ColorManager : MonoBehaviour
     [HideInInspector] public bool UseHCL;
     [HideInInspector] public bool ShowAtoms;
     [HideInInspector] public bool ShowChains;
+    [HideInInspector] public bool ShowResidues;
+    [HideInInspector] public bool ShowSecondaryStructures;
+    
+    [HideInInspector] public float AtomDistance;
+    [HideInInspector] public float ResidueDistance;
+    [HideInInspector] public float SecondaryStructureDistance;
 
     //*******//
 
@@ -62,7 +68,7 @@ public class ColorManager : MonoBehaviour
 
     [HideInInspector]
     public float[] LevelRanges = new float[0];
-    
+
 
     //*******//
 

@@ -300,8 +300,21 @@ public class SceneManager : MonoBehaviour
 
         for (var i = 0; i < atoms.Count; i++)
         {
+            var helix = atoms[i].helixId >= 0;
+            var sheet = atoms[i].sheetId >= 0;
+            //if (helix && sheet) throw new Exception("Da fuk just happened");
+
+            var secondaryStructure = 0;
+            secondaryStructure = (helix) ? 1 : secondaryStructure;
+            secondaryStructure = (sheet) ? 2 : secondaryStructure;
+
+            //if (sheet)
+            //{
+            //    int a = 0;
+            //}                
+
             CPUBuffers.Get.ProteinAtoms.Add(new Vector4(atoms[i].position.x, atoms[i].position.y, atoms[i].position.z, atoms[i].radius));
-            CPUBuffers.Get.ProteinAtomInfo.Add(new Vector4(i, atoms[i].symbolId, atoms[i].residueId, atoms[i].chainId));
+            CPUBuffers.Get.ProteinAtomInfo.Add(new Vector4(secondaryStructure, atoms[i].symbolId, atoms[i].residueId, atoms[i].chainId));
         }
 
         if (clusterLevels != null)

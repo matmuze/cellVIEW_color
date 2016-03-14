@@ -2,7 +2,7 @@
 
 struct AtomInfo
 {
-	float atomIndex;
+	float secondaryStructure;
 	float atomSymbolId;
 	float residueSymbolId;
 	float chainSymbolId;

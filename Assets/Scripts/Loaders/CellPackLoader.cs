@@ -91,7 +91,7 @@ namespace Loaders
             else
             {
                 // Load atom set from pdb file
-                atoms = PdbLoader.LoadAtomSet(pdbName);
+                atoms = PdbLoader.LoadAtomDataFull(pdbName);
             }
 
             // If the set is empty return

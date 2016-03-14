@@ -43,6 +43,12 @@ public class DrawBillboards : MonoBehaviour
     public bool UseHCL;
     public bool ShowAtoms;
     public bool ShowChains;
+    public bool ShowResidues;
+    public bool ShowSecondaryStructures;
+
+    public float AtomDistance;
+    public float ResidueDistance;
+    public float SecondaryStructureDistance;
 
     //public bool ComputeGroupingForces;
     //public bool ComputeNodeDistancesForces;
@@ -724,6 +730,12 @@ public class DrawBillboards : MonoBehaviour
         ColorManager.Get.UseHCL = UseHCL;
         ColorManager.Get.ShowAtoms = ShowAtoms;
         ColorManager.Get.ShowChains = ShowChains;
+        ColorManager.Get.ShowResidues = ShowResidues;
+        ColorManager.Get.ShowSecondaryStructures = ShowSecondaryStructures;
+
+        ColorManager.Get.AtomDistance = AtomDistance;
+        ColorManager.Get.ResidueDistance = ResidueDistance;
+        ColorManager.Get.SecondaryStructureDistance = SecondaryStructureDistance;
 
         InitSystem();
         UpdatePositions();

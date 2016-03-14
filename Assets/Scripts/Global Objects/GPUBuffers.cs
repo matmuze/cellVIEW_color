@@ -123,8 +123,7 @@ public class GPUBuffers : MonoBehaviour
     public ComputeBuffer IngredientStates;
     public ComputeBuffer IngredientMaskParams;
     public ComputeBuffer IngredientEdgeOpacity;
-
-
+    
     // Protein buffers
     public ComputeBuffer ProteinRadii;
 

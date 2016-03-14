@@ -13,6 +13,45 @@ public static class PdbLoader
 {
     public static string DefaultPdbDirectory = Application.dataPath + "/../Data/proteins/";
 
+    public static List<Atom> LoadAtomDataFull(string fileName)
+    {
+        var path = GetPdbFile(fileName, DefaultPdbDirectory);
+        var atomData = ReadAtomData(path);
+        var helixData = ReadHelixData(path);
+        var sheetData = ReadSheetData(path);
+
+        for(int i = 0; i < atomData.Count; i++)
+        {
+            var atom = atomData[i];
+            foreach(var helix in helixData)
+            {
+                if (atom.residueIndex >= helix.initialResidueSequenceNumber 
+                    && atom.residueIndex <= helix.terminalResidueSequenceNumber 
+                    && (atom.chain == helix.initialChainIdentifier || atom.chain == helix.terminalChainIdentifier))
+                    atom.helixId = helix.helixNumber;
+            }
+        }
+
+        for (int i = 0; i < atomData.Count; i++)
+        {
+            var atom = atomData[i];
+            foreach (var sheet in sheetData)
+            {
+                if (atom.residueIndex >= sheet.initialResidueSequenceNumber
+                    && atom.residueIndex <= sheet.terminalResidueSequenceNumber
+                    && (atom.chain == sheet.initialChainIdentifier || atom.chain == sheet.terminalChainIdentifier))
+                {
+                    atom.sheetId = sheet.strandNumber;
+                    if (atom.helixId > 0)
+                        Debug.Log("Can't be both helix and sheet");
+                }
+                    
+            }
+        }
+
+        return atomData;
+    }
+
     public static List<Atom> LoadAtomSet(string fileName)
     {
         var path = GetPdbFile(fileName, DefaultPdbDirectory);
@@ -133,13 +172,126 @@ public static class PdbLoader
         return filePath;
     }
 
+    public static List<Helix> ReadHelixData(string path)
+    {
+        if (!File.Exists(path)) throw new Exception("File not found at: " + path);
+        var pdbName = Path.GetFileName(path);
+        
+        var helices = new List<Helix>();
+        var lines = File.ReadAllLines(path);
+        
+        foreach (var line in lines)
+        {
+            if (line.StartsWith("HELIX"))
+            {
+                var helix = new Helix();
+
+                if (line.Length < 10)
+                { helices.Add(helix); continue; }
+                helix.helixNumber = int.Parse(line.Substring(7, 3).Trim());
+
+                if (line.Length < 14)
+                { helices.Add(helix); continue; }
+                helix.helixIdentifier = line.Substring(11, 3).Trim();
+
+                if (line.Length < 18)
+                { helices.Add(helix); continue; }
+                helix.initialResidueName = line.Substring(15, 3).Trim();
+
+                if (line.Length < 20)
+                { helices.Add(helix); continue; }
+                helix.initialChainIdentifier = line.Substring(19, 1).Trim();
+
+                if (line.Length < 25)
+                { helices.Add(helix); continue; }
+                helix.initialResidueSequenceNumber = int.Parse(line.Substring(21, 4).Trim());
+
+                if (line.Length < 30)
+                { helices.Add(helix); continue; }
+                helix.terminalResidueName = line.Substring(27, 3).Trim();
+
+                if (line.Length < 32)
+                { helices.Add(helix); continue; }
+                helix.terminalChainIdentifier = line.Substring(31, 1).Trim();
+
+                if (line.Length < 37)
+                { helices.Add(helix); continue; }
+                helix.terminalResidueSequenceNumber = int.Parse(line.Substring(33, 4).Trim());
+
+                if (line.Length < 76)
+                { helices.Add(helix); continue; }
+                helix.helixSize = int.Parse(line.Substring(71, 5).Trim());
+
+                helices.Add(helix);
+            }
+        }
+
+        return helices;
+    }
+
+    public static List<Sheet> ReadSheetData(string path)
+    {
+        if (!File.Exists(path)) throw new Exception("File not found at: " + path);
+        var pdbName = Path.GetFileName(path);
+
+        var sheets = new List<Sheet>();
+        var lines = File.ReadAllLines(path);
+
+        foreach (var line in lines)
+        {
+            if (line.StartsWith("SHEET"))
+            {
+                var sheet = new Sheet();
+
+                if (line.Length < 10)
+                { sheets.Add(sheet); continue; }
+                sheet.strandNumber = int.Parse(line.Substring(7, 3));
+
+                if (line.Length < 14)
+                { sheets.Add(sheet); continue; }
+                sheet.sheetIdentifier = line.Substring(11, 3);
+
+                if (line.Length < 16)
+                { sheets.Add(sheet); continue; }
+                sheet.strandCount = int.Parse(line.Substring(14, 2));
+
+                if (line.Length < 20)
+                { sheets.Add(sheet); continue; }
+                sheet.initialResidueName = line.Substring(17, 3);
+
+                if (line.Length < 22)
+                { sheets.Add(sheet); continue; }
+                sheet.initialChainIdentifier = line.Substring(21, 1);
+
+                if (line.Length < 26)
+                { sheets.Add(sheet); continue; }
+                sheet.initialResidueSequenceNumber = int.Parse(line.Substring(22, 4));
+
+                if (line.Length < 31)
+                { sheets.Add(sheet); continue; }
+                sheet.terminalResidueName = line.Substring(28, 3);
+
+                if (line.Length < 33)
+                { sheets.Add(sheet); continue; }
+                sheet.terminalChainIdentifier = line.Substring(32, 1);
+
+                if (line.Length < 37)
+                { sheets.Add(sheet); continue; }
+                sheet.terminalResidueSequenceNumber = int.Parse(line.Substring(33, 4));
+
+                sheets.Add(sheet);
+            }
+        }
+
+        return sheets;
+    }
+
     //http://deposit.rcsb.org/adit/docs/pdb_atom_format.html#ATOM
     public static List<Atom> ReadAtomData(string path)
     {
         if (!File.Exists(path)) throw new Exception("File not found at: " + path);
         var pdbName = Path.GetFileName(path);
-
-
+        
         var chains = new List<string>();
 
         var atoms = new List<Atom>();
@@ -310,12 +462,56 @@ public class Atom
     public int residueId;
     public int residueIndex;
 
+    public int helixId = -1;
+    public int sheetId = -1;
+
     public string name;
     public string chain;
     public string symbol;
     public string residueName;
     
     public Vector3 position;
+}
+
+public class Helix
+{
+    public Helix() { }
+
+    public Helix(Helix helix)
+    {
+
+    }    
+
+    public int helixNumber;
+    public string helixIdentifier;
+    public string initialResidueName;
+    public string initialChainIdentifier;
+    public int initialResidueSequenceNumber;
+    public string terminalResidueName;
+    public string terminalChainIdentifier;
+    public int terminalResidueSequenceNumber;
+    public int helixSize;
+
+}
+
+public class Sheet
+{
+    public Sheet() { }
+
+    public Sheet(Sheet sheet)
+    {
+        
+    }
+
+    public int strandNumber;
+    public string sheetIdentifier;
+    public int strandCount;
+    public string initialResidueName;
+    public string initialChainIdentifier;
+    public int initialResidueSequenceNumber;
+    public string terminalResidueName;
+    public string terminalChainIdentifier;
+    public int terminalResidueSequenceNumber;
 }
 
 public static class AtomHelper

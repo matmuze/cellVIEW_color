@@ -123,9 +123,18 @@
 	uniform int _UseHCL;
 	uniform int _ShowAtoms;
 	uniform int _ShowChains;
+	uniform int _ShowResidues;
+	uniform int _ShowSecondaryStructures;
 
-	uniform float _depth;
+	uniform float _ChainDistance;
+	uniform float _AtomDistance;
+	uniform float _ResidueDistance;
+	uniform float _SecondaryStructureDistance;
+
+	//uniform float _depth;
 	//*****//
+
+	uniform float4 _DistanceLevels;
 
 	int GetLevelDistance(int level)
 	{
@@ -208,7 +217,7 @@
 		}
 		else if (instanceId >= 0)
 		{
-			int colorChoice = 3;
+			int colorChoice = 0;
 
 			AtomInfo atomInfo = _ProteinAtomInfos[atomId];
 			ProteinInstanceInfo proteinInstanceInfo = _ProteinInstanceInfo[instanceId];
@@ -231,15 +240,14 @@
 			float4 proteinIngredientsChainColor = _IngredientsChainColors[proteinIngredientInfo.chainColorStartIndex + atomInfo.chainSymbolId];
 			float4 proteinIngredientsColor = _IngredientsColors[proteinInstanceInfo.proteinIngredientType];
 			float4 ingredientGroupColor = _IngredientGroupsColor[proteinIngredientInfo.proteinIngredientGroupId];
+			float4 secondaryStructureColor = (atomInfo.secondaryStructure <= 0) ? float4(1,1,1,1) : (round(atomInfo.secondaryStructure) <= 1) ? float4(1,0,0.5,1) : float4(1,0.7843,0,1);
 
 			// Goodsell coloring
 			float4 goodsellColor = (atomInfo.atomSymbolId == 0) ? proteinIngredientsChainColor : proteinIngredientsChainColor * (1- 0.25);
 						
-			
-
 			if(colorChoice == 0)
 			{
-				color = aminoAcidColor;
+				color = secondaryStructureColor;
 				return;
 			}
 			else if(colorChoice == 1)
@@ -267,34 +275,34 @@
 			}
 			else if(colorChoice == 2)
 			{
-				//ingredientgroupcolor is of type color in C#, so i needed to rescale, kind of a hack. Should eventually be changed to vector.
-				ingredientGroupColor.x = ingredientGroupColor.x * 360;
-				ingredientGroupColor.y = ingredientGroupColor.y * 100;
-				ingredientGroupColor.z = ingredientGroupColor.z * 100;
+				////ingredientgroupcolor is of type color in C#, so i needed to rescale, kind of a hack. Should eventually be changed to vector.
+				//ingredientGroupColor.x = ingredientGroupColor.x * 360;
+				//ingredientGroupColor.y = ingredientGroupColor.y * 100;
+				//ingredientGroupColor.z = ingredientGroupColor.z * 100;
 									
-				////*******//
-				//test compartment color
-				float h = proteinIngredientsColor.x;
-				float c = proteinIngredientsColor.y;
-				float l = proteinIngredientsChainColor.z;
+				//////*******//
+				////test compartment color
+				//float h = proteinIngredientsColor.x;
+				//float c = proteinIngredientsColor.y;
+				//float l = proteinIngredientsChainColor.z;
 
-				float4 luminances;
-				luminances[0] = ingredientGroupColor.z;
-				luminances[1] = proteinIngredientsColor.z;
-				luminances[2] = proteinIngredientsChainColor.z;
-				luminances[3] = 70;
-				float4x2 HCs = float4x2(ingredientGroupColor.xy, proteinIngredientsColor.xy, proteinIngredientsChainColor.xy, atomColor.xy);
+				//float4 luminances;
+				//luminances[0] = ingredientGroupColor.z;
+				//luminances[1] = proteinIngredientsColor.z;
+				//luminances[2] = proteinIngredientsChainColor.z;
+				//luminances[3] = 70;
+				//float4x2 HCs = float4x2(ingredientGroupColor.xy, proteinIngredientsColor.xy, proteinIngredientsChainColor.xy, atomColor.xy);
 			
-				//tbd, temporary replacement because atomcolor is rgb
-				HCs[3][0] = 100;
-				HCs[3][1] =70;
+				////tbd, temporary replacement because atomcolor is rgb
+				//HCs[3][0] = 100;
+				//HCs[3][1] =70;
 
-	    		float3 hclMelded = getDepthLuminanceManuFormula(_depth , luminances, HCs);
-				//tbd, temporary replacement because atomcolor is rgb
-				//		HCs[3][0] = 100;
-				//		HCs[3][1] =50;
+	   // 		float3 hclMelded = getDepthLuminanceManuFormula(_depth , luminances, HCs);
+				////tbd, temporary replacement because atomcolor is rgb
+				////		HCs[3][0] = 100;
+				////		HCs[3][1] =50;
 							
-				color = float4(d3_hcl_lab(hclMelded.x, hclMelded.y, hclMelded.z), 1);
+				//color = float4(d3_hcl_lab(hclMelded.x, hclMelded.y, hclMelded.z), 1);
 			}
 			else if(colorChoice == 3)
 			{
@@ -323,9 +331,9 @@
 				//float l = 75;
 
 				float cc = max(eyeDepth - 10, 0);
-				float dd = 30 - 10;
+				float dd = _AtomDistance - 10;
 
-				if(eyeDepth < 30)
+				if(eyeDepth < _AtomDistance)
 				{
 					if(_ShowAtoms)
 					{
@@ -335,17 +343,17 @@
 					}
 				}				
 
-				if(eyeDepth < 40 && proteinIngredientInfo.numChains > 1)
+				if(eyeDepth < _ChainDistance && proteinIngredientInfo.numChains > 1)
 				{
 					float cc = max(eyeDepth - 10, 0);
-					float dd = 40 - 10;
+					float dd = _ChainDistance - 10;
 
 					float hueShift = 35;
 					hueShift = proteinIngredientInfo.numChains >= 3 ? 30 : hueShift;
 					hueShift = proteinIngredientInfo.numChains >= 4 ? 30 : hueShift;
 					hueShift = proteinIngredientInfo.numChains >= 5 ? 30 : hueShift;
-					hueShift = proteinIngredientInfo.numChains >= 6 ? 15 : hueShift;		
-					hueShift = proteinIngredientInfo.numChains >= 7 ? 25 : hueShift;		
+					hueShift = proteinIngredientInfo.numChains >= 6 ? 30 : hueShift;		
+					hueShift = proteinIngredientInfo.numChains >= 7 ? 30 : hueShift;		
 					hueShift = proteinIngredientInfo.numChains >= 8 ? 30 : hueShift;		
 					hueShift = proteinIngredientInfo.numChains >= 9 ? 30 : hueShift;		
 					hueShift = proteinIngredientInfo.numChains >= 10 ? 15 : hueShift;		

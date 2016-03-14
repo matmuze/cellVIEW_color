@@ -104,7 +104,12 @@ public class CellViewMenuCommands
         EditorSceneManager.MarkAllScenesDirty();
     }
 
-    
+    // Add menu item named "My Window" to the Window menu
+    [MenuItem("cellVIEW/debug PDB Loader")]
+    public static void ReloadCellPackResults()
+    {
+        PdbLoader.LoadAtomDataFull("7aat");
+    }
 
     //// Add menu item named "My Window" to the Window menu
     //[MenuItem("cellVIEW/Reload cellPACK results")]
