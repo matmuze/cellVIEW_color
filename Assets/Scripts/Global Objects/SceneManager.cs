@@ -297,16 +297,17 @@ public class SceneManager : MonoBehaviour
 
         CPUBuffers.Get.ProteinAtomCount.Add(atoms.Count);
         CPUBuffers.Get.ProteinAtomStart.Add(CPUBuffers.Get.ProteinAtoms.Count);
+               
 
         for (var i = 0; i < atoms.Count; i++)
         {
-            var helix = atoms[i].helixId >= 0;
-            var sheet = atoms[i].sheetId >= 0;
+            var helix = atoms[i].helixIndex >= 0;
+            var sheet = atoms[i].sheetIndex >= 0;
             //if (helix && sheet) throw new Exception("Da fuk just happened");
 
             var secondaryStructure = 0;
-            secondaryStructure = (helix) ? 1 : secondaryStructure;
-            secondaryStructure = (sheet) ? 2 : secondaryStructure;
+            secondaryStructure = (helix) ? atoms[i].helixIndex : secondaryStructure;
+            secondaryStructure = (sheet) ? -atoms[i].sheetIndex : secondaryStructure;
 
             //if (sheet)
             //{
@@ -315,6 +316,7 @@ public class SceneManager : MonoBehaviour
 
             CPUBuffers.Get.ProteinAtoms.Add(new Vector4(atoms[i].position.x, atoms[i].position.y, atoms[i].position.z, atoms[i].radius));
             CPUBuffers.Get.ProteinAtomInfo.Add(new Vector4(secondaryStructure, atoms[i].symbolId, atoms[i].residueId, atoms[i].chainId));
+            CPUBuffers.Get.ProteinAtomInfo2.Add(new Vector4(atoms[i].helixIndex, atoms[i].nbHelicesPerChain, atoms[i].sheetIndex, atoms[i].nbSheetsPerChain));
         }
 
         if (clusterLevels != null)

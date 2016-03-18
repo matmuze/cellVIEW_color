@@ -139,7 +139,7 @@ public class SelectionManager : MonoBehaviour
 
     private MainCameraController controller;
 
-
+    
     public void SetSelectedObject(int instanceID)
     {
         if (instanceID >= CPUBuffers.Get.ProteinInstancePositions.Count) return;

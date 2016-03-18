@@ -20,33 +20,72 @@ public static class PdbLoader
         var helixData = ReadHelixData(path);
         var sheetData = ReadSheetData(path);
 
-        for(int i = 0; i < atomData.Count; i++)
-        {
-            var atom = atomData[i];
-            foreach(var helix in helixData)
-            {
-                if (atom.residueIndex >= helix.initialResidueSequenceNumber 
-                    && atom.residueIndex <= helix.terminalResidueSequenceNumber 
-                    && (atom.chain == helix.initialChainIdentifier || atom.chain == helix.terminalChainIdentifier))
-                    atom.helixId = helix.helixNumber;
-            }
-        }
+        var helicesPerChain = new Dictionary<string, List<string>>();
+        var sheetsPerChain = new Dictionary<string, List<string>>();
 
         for (int i = 0; i < atomData.Count; i++)
         {
             var atom = atomData[i];
+
+            foreach (var helix in helixData)
+            {
+                if (atom.residueIndex >= helix.initialResidueSequenceNumber
+                    && atom.residueIndex <= helix.terminalResidueSequenceNumber
+                    && (atom.chain == helix.initialChainIdentifier || atom.chain == helix.terminalChainIdentifier))
+                {
+                    atom.helixName = helix.helixIdentifier;
+
+                    if (!helicesPerChain.ContainsKey(atom.chain)) helicesPerChain[atom.chain] = new List<string>();
+                    if (!helicesPerChain[atom.chain].Contains(atom.helixName)) helicesPerChain[atom.chain].Add(atom.helixName);
+                    break;
+                }
+            }
+        }
+        
+        //*******//
+
+        for (int i = 0; i < atomData.Count; i++)
+        {
+            var atom = atomData[i];
+
             foreach (var sheet in sheetData)
             {
                 if (atom.residueIndex >= sheet.initialResidueSequenceNumber
                     && atom.residueIndex <= sheet.terminalResidueSequenceNumber
                     && (atom.chain == sheet.initialChainIdentifier || atom.chain == sheet.terminalChainIdentifier))
                 {
-                    atom.sheetId = sheet.strandNumber;
-                    if (atom.helixId > 0)
-                        Debug.Log("Can't be both helix and sheet");
+                    atom.sheetName = sheet.sheetIdentifier;
+
+                    if (!sheetsPerChain.ContainsKey(atom.chain)) sheetsPerChain[atom.chain] = new List<string>();
+                    if (!sheetsPerChain[atom.chain].Contains(atom.sheetName)) sheetsPerChain[atom.chain].Add(atom.sheetName);
+                    break;
                 }
-                    
             }
+        }
+                
+        for (int i = 0; i < atomData.Count; i++)
+        {
+            var atom = atomData[i];
+
+            if(!string.IsNullOrEmpty(atom.helixName))
+            {
+                if(!helicesPerChain.ContainsKey(atom.chain))
+                {
+                    throw new Exception("A severe parsing error occured");
+                }
+                atom.nbHelicesPerChain = helicesPerChain[atom.chain].Count;
+                atom.helixIndex = helicesPerChain[atom.chain].IndexOf(atom.helixName);
+            }
+            
+            if(!string.IsNullOrEmpty(atom.sheetName))
+            {
+                if (!sheetsPerChain.ContainsKey(atom.chain))
+                {
+                    throw new Exception("A severe parsing error occured");
+                }
+                atom.nbSheetsPerChain = sheetsPerChain[atom.chain].Count;
+                atom.sheetIndex = sheetsPerChain[atom.chain].IndexOf(atom.sheetName);
+            }            
         }
 
         return atomData;
@@ -459,8 +498,15 @@ public class Atom
     public int residueId;
     public int residueIndex;
 
-    public int helixId = -1;
-    public int sheetId = -1;
+    //public int helixId = -1;
+    public string helixName = "";
+    public int helixIndex = -1;
+
+    public string sheetName = "";
+    public int sheetIndex = -1;
+
+    public int nbHelicesPerChain = -1;
+    public int nbSheetsPerChain = -1;
 
     public string name;
     public string chain;

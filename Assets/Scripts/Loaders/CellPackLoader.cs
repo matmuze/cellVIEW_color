@@ -116,7 +116,7 @@ namespace Loaders
             // ***** Load atoms *****//
             
             var atoms = GetAtoms(ingredient);
-
+                  
             var numChains = AtomHelper.GetNumChains(atoms);
             Debug.Log("Num chains: " + numChains);
 

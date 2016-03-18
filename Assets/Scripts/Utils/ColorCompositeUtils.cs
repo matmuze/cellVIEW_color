@@ -155,6 +155,7 @@ public static class ColorCompositeUtils
 
         // Properties
         colorCompositeMaterial.SetBuffer("_ProteinAtomInfos", GPUBuffers.Get.ProteinAtomInfo);
+        colorCompositeMaterial.SetBuffer("_ProteinAtomInfos2", GPUBuffers.Get.ProteinAtomInfo2);
         colorCompositeMaterial.SetBuffer("_ProteinInstanceInfo", GPUBuffers.Get.ProteinInstancesInfo);
         colorCompositeMaterial.SetBuffer("_LipidAtomInfos", GPUBuffers.Get.LipidAtomPositions);
         colorCompositeMaterial.SetBuffer("_LipidInstancesInfo", GPUBuffers.Get.LipidInstancesInfo);

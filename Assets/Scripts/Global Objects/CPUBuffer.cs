@@ -64,7 +64,9 @@ public class CPUBuffers : MonoBehaviour
     [HideInInspector]
     public List<Vector4> ProteinAtoms = new List<Vector4>();
     [HideInInspector]
-    public List<Vector4> ProteinAtomInfo = new List<Vector4>();
+    public List<Vector4> ProteinAtomInfo = new List<Vector4>();    
+    [HideInInspector]
+    public List<Vector4> ProteinAtomInfo2 = new List<Vector4>();
     [HideInInspector]
     public List<float> ProteinIngredientsRadii = new List<float>();
     [HideInInspector]
@@ -243,7 +245,6 @@ public class CPUBuffers : MonoBehaviour
         GPUBuffers.Get.AminoAcidColors.SetData(AtomHelper.ResidueColors);
         GPUBuffers.Get.IngredientsColors.SetData(CPUBuffers.Get.IngredientsColors.ToArray());
         GPUBuffers.Get.IngredientsChainColors.SetData(CPUBuffers.Get.ProteinIngredientsChainColors.ToArray());
-        GPUBuffers.Get.ProteinAtomInfo.SetData(CPUBuffers.Get.ProteinAtomInfo.ToArray());
         GPUBuffers.Get.IngredientsInfo.SetData(CPUBuffers.Get.IngredientsInfo.ToArray());
         GPUBuffers.Get.IngredientGroupsColor.SetData(CPUBuffers.Get.IngredientGroupsColor.ToArray());
 
@@ -269,6 +270,7 @@ public class CPUBuffers : MonoBehaviour
 
         GPUBuffers.Get.ProteinAtoms.SetData(CPUBuffers.Get.ProteinAtoms.ToArray());
         GPUBuffers.Get.ProteinAtomInfo.SetData(CPUBuffers.Get.ProteinAtomInfo.ToArray());
+        GPUBuffers.Get.ProteinAtomInfo2.SetData(CPUBuffers.Get.ProteinAtomInfo2.ToArray());
         GPUBuffers.Get.ProteinAtomCount.SetData(CPUBuffers.Get.ProteinAtomCount.ToArray());
         GPUBuffers.Get.ProteinAtomStart.SetData(CPUBuffers.Get.ProteinAtomStart.ToArray());
 

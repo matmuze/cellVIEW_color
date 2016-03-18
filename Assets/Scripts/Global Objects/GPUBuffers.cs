@@ -129,6 +129,7 @@ public class GPUBuffers : MonoBehaviour
 
     public ComputeBuffer ProteinAtoms;
     public ComputeBuffer ProteinAtomInfo;
+    public ComputeBuffer ProteinAtomInfo2;
     public ComputeBuffer ProteinAtomCount;
     public ComputeBuffer ProteinAtomStart;
 
@@ -241,6 +242,7 @@ public class GPUBuffers : MonoBehaviour
 
         if (ProteinAtoms == null) ProteinAtoms = new ComputeBuffer(NumProteinAtomMax, 16);
         if (ProteinAtomInfo == null) ProteinAtomInfo = new ComputeBuffer(NumProteinAtomMax, 16);
+        if (ProteinAtomInfo2 == null) ProteinAtomInfo2 = new ComputeBuffer(NumProteinAtomMax, 16);
         if (ProteinAtomClusters == null) ProteinAtomClusters = new ComputeBuffer(NumProteinAtomClusterMax, 16);
 
         if (ProteinAtomCount == null) ProteinAtomCount = new ComputeBuffer(NumProteinTypeMax, 4);
