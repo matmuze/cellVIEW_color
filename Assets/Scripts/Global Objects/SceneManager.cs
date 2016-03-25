@@ -297,8 +297,8 @@ public class SceneManager : MonoBehaviour
 
         CPUBuffers.Get.ProteinAtomCount.Add(atoms.Count);
         CPUBuffers.Get.ProteinAtomStart.Add(CPUBuffers.Get.ProteinAtoms.Count);
-               
 
+        int counter = 0;
         for (var i = 0; i < atoms.Count; i++)
         {
             var helix = atoms[i].helixIndex >= 0;
@@ -308,6 +308,11 @@ public class SceneManager : MonoBehaviour
             var secondaryStructure = 0;
             secondaryStructure = (helix) ? atoms[i].helixIndex : secondaryStructure;
             secondaryStructure = (sheet) ? -atoms[i].sheetIndex : secondaryStructure;
+    //        if (atoms[i].sheetIndex < 0 && counter < 2)
+     //       {
+      //          Debug.Log("less than zero " + atoms[i].helixIndex);
+       //         counter += 1;
+        //    }
 
             //if (sheet)
             //{
@@ -316,7 +321,7 @@ public class SceneManager : MonoBehaviour
 
             CPUBuffers.Get.ProteinAtoms.Add(new Vector4(atoms[i].position.x, atoms[i].position.y, atoms[i].position.z, atoms[i].radius));
             CPUBuffers.Get.ProteinAtomInfo.Add(new Vector4(secondaryStructure, atoms[i].symbolId, atoms[i].residueId, atoms[i].chainId));
-            CPUBuffers.Get.ProteinAtomInfo2.Add(new Vector4(atoms[i].helixIndex, atoms[i].nbHelicesPerChain, atoms[i].sheetIndex, atoms[i].nbSheetsPerChain));
+            CPUBuffers.Get.ProteinAtomInfo2.Add(new Vector4(Mathf.Max(atoms[i].helixIndex, 0), Mathf.Max(atoms[i].nbHelicesPerChain, 0), Mathf.Min(-atoms[i].sheetIndex,0), Mathf.Max(atoms[i].nbSheetsPerChain, 0)));
         }
 
         if (clusterLevels != null)

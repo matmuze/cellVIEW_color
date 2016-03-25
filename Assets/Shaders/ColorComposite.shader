@@ -337,20 +337,15 @@
 
 				//l = 50;
 				
-				if(_ShowSecondaryStructures)
-				{				
-					int secondaryStructure = round(atomInfo.secondaryStructure);
-					h = (secondaryStructure == 0) ? 0 : (secondaryStructure > 0) ? secondaryStructure * 30 : 0;
-				}	
+				//this is debug
+			//	if(_ShowSecondaryStructures)
+			//	{				
+			//		int secondaryStructure = round(atomInfo.secondaryStructure);
+			//		h = (secondaryStructure == 0) ? 0 : (secondaryStructure > 0) ? secondaryStructure * 30 : 0;
+			//	}	
 
-				//if(_ShowSecondaryStructures && eyeDepth < _SecondaryStructureDistance)
-				//{
-				//	float factor = (1-(eyeDepth / _SecondaryStructureDistance)) * 35;
-				//	//color = lerp(aminoAcidColor, atomColor, 1-factor);	
-						
-				//	//c = (atomInfo.secondaryStructure <= 0) ? c : (round(atomInfo.secondaryStructure) <= 1) ? c - factor : c + factor;
-				//	l = (atomInfo.secondaryStructure <= 0) ? l : (round(atomInfo.secondaryStructure) <= 1) ? l - factor : l + factor;
-				//}	
+				
+					
 				
 				//if(eyeDepth < _AtomDistance)
 				//{
@@ -370,17 +365,22 @@
 					float cc = max(eyeDepth - 25, 0);
 					float dd = _ChainDistance - 25;
 
-					float hueShift = 50;
-					hueShift = proteinIngredientInfo.numChains >= 3 ? 50 : hueShift;
-					hueShift = proteinIngredientInfo.numChains >= 4 ? 50 : hueShift;
-					hueShift = proteinIngredientInfo.numChains >= 5 ? 50 : hueShift;
-					hueShift = proteinIngredientInfo.numChains >= 6 ? 50 : hueShift;		
-					hueShift = proteinIngredientInfo.numChains >= 7 ? 40 : hueShift;		
-					hueShift = proteinIngredientInfo.numChains >= 8 ? 30 : hueShift;		
-					hueShift = proteinIngredientInfo.numChains >= 9 ? 30 : hueShift;		
-					hueShift = proteinIngredientInfo.numChains >= 10 ? 15 : hueShift;		
-					hueShift = proteinIngredientInfo.numChains >= 11 ? 10 : hueShift;		
-					hueShift = proteinIngredientInfo.numChains >= 12 ? 10 : hueShift;	
+					
+
+				//	float hueShift = 50;
+					float wedge = min(20 * proteinIngredientInfo.numChains, 180);
+					float hueShift = wedge / proteinIngredientInfo.numChains;
+					//float hueShift = 50;
+					//hueShift = proteinIngredientInfo.numChains >= 3 ? 50 : hueShift;
+					//hueShift = proteinIngredientInfo.numChains >= 4 ? 50 : hueShift;
+					//hueShift = proteinIngredientInfo.numChains >= 5 ? 50 : hueShift;
+					//hueShift = proteinIngredientInfo.numChains >= 6 ? 50 : hueShift;		
+					//hueShift = proteinIngredientInfo.numChains >= 7 ? 40 : hueShift;		
+					//hueShift = proteinIngredientInfo.numChains >= 8 ? 30 : hueShift;		
+					//hueShift = proteinIngredientInfo.numChains >= 9 ? 30 : hueShift;		
+					//hueShift = proteinIngredientInfo.numChains >= 10 ? 15 : hueShift;		
+					//hueShift = proteinIngredientInfo.numChains >= 11 ? 10 : hueShift;		
+					//hueShift = proteinIngredientInfo.numChains >= 12 ? 10 : hueShift;	
 					hueShift *= (1-(cc/dd));
 										
 					float hueLength = hueShift * (proteinIngredientInfo.numChains - 1);
@@ -396,6 +396,69 @@
 					//float lumaShift = (25 / (proteinIngredientInfo.numChains * 0.3)) * (1-(eyeDepth/40.0f)) ;
 					//float lumaOffset = proteinIngredientInfo.numChains * 0.5 * lumaShift;
 					//l +=  lumaOffset - (atomInfo.chainSymbolId * lumaShift);					 
+				}
+
+				//this is old
+				if(_ShowSecondaryStructures && eyeDepth < _SecondaryStructureDistance)
+				{
+					float factor = (1-(eyeDepth / _SecondaryStructureDistance)) * 35;
+						//color = lerp(aminoAcidColor, atomColor, 1-factor);	
+						
+						//c = (atomInfo.secondaryStructure <= 0) ? c : (round(atomInfo.secondaryStructure) <= 1) ? c - factor : c + factor;
+						// MWa: changed this with hue
+						//l = (atomInfo.secondaryStructure <= 0) ? l : (round(atomInfo.secondaryStructure) <= 1) ? l - factor : l + factor;
+
+						float totalnumsecondary = _ProteinAtomInfos2[atomId].y + _ProteinAtomInfos2[atomId].w + 1; //+1 so not zero
+
+						float wedge = min(20 * totalnumsecondary, 180);
+						float hueShift = wedge / totalnumsecondary;
+
+						float myvalue = 0;
+						if(atomInfo2.x < 0){
+						color = float4(1,1,0,1);
+							return;}
+							if(atomInfo2.z > 0){
+						color = float4(1,1,1,1);
+							return;}
+							if(atomInfo2.y < 0){
+						color = float4(1,1,1,1);
+							return;}
+							if(atomInfo2.w < 0){
+						color = float4(1,1,1,1);
+							return;}
+						if(atomInfo2.x - atomInfo2.z == 0){
+							myvalue = (atomInfo2.y + atomInfo2.w)/2;
+							}
+						else{
+							myvalue = atomInfo2.x>0 ? atomInfo2.x : atomInfo2.y - atomInfo2.z; //z is sheet and negative
+							if (myvalue >= (atomInfo2.y + atomInfo2.w)/2-0.000001){
+								myvalue += 1;}
+
+							}
+
+						
+
+						float cc = max(eyeDepth - 10, 0);
+						float dd = _SecondaryStructureDistance - 10;
+						hueShift *= (1-(cc/dd));
+						float hueLength = hueShift * (totalnumsecondary-1);
+						float hueOffset = hueLength * 0.5;
+										
+					//	hueLength = hueShift;
+					//	hueOffset = hueLength * 0.5;
+
+						h -=  hueOffset;
+						h += (myvalue * hueShift);	
+
+						float lFactor  = (1-(eyeDepth / _SecondaryStructureDistance)); 
+						float lg = 60;
+						lg += atomColor.x * 10;
+						lg += atomColor.y * 40;
+						lg += atomColor.z * 2;
+						//l = lerp(l, lg, lFactor);	
+
+						//if(atomInfo.secondaryStructure == 0) l=0;
+						//MWa: end
 				}
 				
 				if (h >= 0)
