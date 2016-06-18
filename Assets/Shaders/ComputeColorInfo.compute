@@ -4,6 +4,7 @@
 #pragma kernel CountProteinInstances
 #pragma kernel CountLipidInstances
 #pragma kernel ClearVisibilityFlags
+#pragma kernel ComputeFocusScore
 
 int _Width;
 int _Height;
@@ -103,5 +104,24 @@ void CountLipidInstances (uint3 id : SV_DispatchThreadID)
 	}
 }
 
+Texture2D<float> _DepthBuffer;
+RWStructuredBuffer<int> _RWProteinFocusScore;
+
+RWStructuredBuffer<int2> _ScoreMax;
+
+
+[numthreads(64,1,1)]
+void ComputeFocusScore (uint3 id : SV_DispatchThreadID)
+{
+	if(id.x >= _Width || id.y >= _Height) return;
+	int instanceId = _InstanceIdBuffer[id.xy];
+	float depth = _DepthBuffer[id.xy];
+
+
+
+	if(instanceId < 0) return;
+
+
+}
 
 

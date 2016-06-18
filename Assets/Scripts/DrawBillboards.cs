@@ -46,6 +46,8 @@ public class DrawBillboards : MonoBehaviour
     public bool ShowResidues;
     public bool ShowSecondaryStructures;
 
+
+    public float ChainDistance;
     public float AtomDistance;
     public float ResidueDistance;
     public float SecondaryStructureDistance;
@@ -733,6 +735,7 @@ public class DrawBillboards : MonoBehaviour
         ColorManager.Get.ShowResidues = ShowResidues;
         ColorManager.Get.ShowSecondaryStructures = ShowSecondaryStructures;
 
+        ColorManager.Get.ChainDistance = ChainDistance;
         ColorManager.Get.AtomDistance = AtomDistance;
         ColorManager.Get.ResidueDistance = ResidueDistance;
         ColorManager.Get.SecondaryStructureDistance = SecondaryStructureDistance;

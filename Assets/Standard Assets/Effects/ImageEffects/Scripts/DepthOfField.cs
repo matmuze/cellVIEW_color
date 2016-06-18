@@ -100,11 +100,12 @@ namespace UnityStandardAssets.ImageEffects
             }
         }
 
-        float FocalDistance01 ( float worldDist) {
+        float FocalDistance01 ( float worldDist)
+        {
             return GetComponent<Camera>().WorldToViewportPoint((worldDist-GetComponent<Camera>().nearClipPlane) * GetComponent<Camera>().transform.forward + GetComponent<Camera>().transform.position).z / (GetComponent<Camera>().farClipPlane-GetComponent<Camera>().nearClipPlane);
         }
 
-        private void WriteCoc ( RenderTexture fromTo, bool fgDilate) {
+        public void WriteCoc ( RenderTexture fromTo, bool fgDilate) {
             dofHdrMaterial.SetTexture("_FgOverlap", null);
 
             if (nearBlur && fgDilate) {
@@ -141,6 +142,48 @@ namespace UnityStandardAssets.ImageEffects
                 Graphics.Blit (fromTo, fromTo, dofHdrMaterial,  0);
             }
         }
+
+        public void DebugFocus(RenderTexture source, RenderTexture destination)
+        {
+                if (!CheckResources())
+                {
+                    Graphics.Blit(source, destination);
+                    return;
+                }
+
+                // clamp & prepare values so they make sense
+
+                if (aperture < 0.0f) aperture = 0.0f;
+                if (maxBlurSize < 0.1f) maxBlurSize = 0.1f;
+                focalSize = Mathf.Clamp(focalSize, 0.0f, 2.0f);
+                internalBlurWidth = Mathf.Max(maxBlurSize, 0.0f);
+
+                // focal & coc calculations
+
+                focalDistance01 = (focalTransform) ? (GetComponent<Camera>().WorldToViewportPoint(focalTransform.position)).z / (GetComponent<Camera>().farClipPlane) : FocalDistance01(focalLength);
+                dofHdrMaterial.SetVector("_CurveParams", new Vector4(1.0f, focalSize, aperture / 10.0f, focalDistance01));
+
+                // possible render texture helpers
+
+                RenderTexture rtLow = null;
+                RenderTexture rtLow2 = null;
+                RenderTexture rtSuperLow1 = null;
+                RenderTexture rtSuperLow2 = null;
+                float fgBlurDist = internalBlurWidth * foregroundOverlap;
+
+                if (true)
+                {
+
+                    //
+                    // 2.
+                    // visualize coc
+                    //
+                    //
+
+                    WriteCoc(source, true);
+                    Graphics.Blit(source, destination, dofHdrMaterial, 16);
+                }
+            }
 
         void OnRenderImage (RenderTexture source, RenderTexture destination) {
             if (!CheckResources ()) {

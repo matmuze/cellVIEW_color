@@ -180,7 +180,7 @@ float3 SetHSL(float3 color, float3 hsl)
 float3 OffsetHSL(float3 color, float3 offset)
 {
 	float3 c = RGBtoHSL(color);		
-	return 	HSLtoRGB(c + offset);		
+	return 	HSLtoRGB(max(c + offset, float3(0,0,0)));		
 }	
 
 //--------------------------------------------------------------------------------------

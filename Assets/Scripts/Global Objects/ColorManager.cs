@@ -48,6 +48,7 @@ public class ColorManager : MonoBehaviour
     [HideInInspector] public bool ShowResidues;
     [HideInInspector] public bool ShowSecondaryStructures;
     
+    [HideInInspector] public float ChainDistance;
     [HideInInspector] public float AtomDistance;
     [HideInInspector] public float ResidueDistance;
     [HideInInspector] public float SecondaryStructureDistance;

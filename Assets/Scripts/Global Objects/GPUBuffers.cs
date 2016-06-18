@@ -99,6 +99,8 @@ public class GPUBuffers : MonoBehaviour
 
     // Colors
 
+    public ComputeBuffer ProteinFocusScore;
+
     public ComputeBuffer IngredientsColorInfo;
     public ComputeBuffer IngredientGroupsColorInfo;
 
@@ -254,6 +256,8 @@ public class GPUBuffers : MonoBehaviour
         if (ProteinInstancePositions == null) ProteinInstancePositions = new ComputeBuffer(NumProteinInstancesMax, 16);
         if (ProteinInstanceRotations == null) ProteinInstanceRotations = new ComputeBuffer(NumProteinInstancesMax, 16);
         if (ProteinInstanceCullFlags == null) ProteinInstanceCullFlags = new ComputeBuffer(NumProteinInstancesMax, 4);
+
+        if (ProteinFocusScore == null) ProteinFocusScore = new ComputeBuffer(NumProteinInstancesMax, 4);
         if (ProteinInstanceOcclusionFlags == null) ProteinInstanceOcclusionFlags = new ComputeBuffer(NumProteinInstancesMax, 4);
         if (ProteinInstanceVisibilityFlags == null) ProteinInstanceVisibilityFlags = new ComputeBuffer(NumProteinInstancesMax, 4);
 

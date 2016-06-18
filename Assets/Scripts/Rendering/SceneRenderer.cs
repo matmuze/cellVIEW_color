@@ -5,7 +5,7 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Messaging;
 using UnityEngine;
 using UnityEngine.Rendering;
-
+using UnityStandardAssets.ImageEffects;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -221,14 +221,6 @@ public class SceneRenderer : MonoBehaviour
         GPUBuffers.Get.ArgBuffer.GetData(batchCount);
         Debug.Log(batchCount[0]);
     }
-
-    
-
-    
-
-    
-    
-   
 
     void DrawCurveIngredients(RenderTexture colorBuffer, RenderTexture idBuffer, RenderTexture depthBuffer)
     {
@@ -607,6 +599,9 @@ public class SceneRenderer : MonoBehaviour
     //    RenderTexture.ReleaseTemporary(compositeDepthBuffer2);
     //}
 
+    public bool DebugDOF;
+    private DepthOfField _depthOfFieldComponent;
+
     // With edges
     [ImageEffectOpaque]
     void OnRenderImage(RenderTexture src, RenderTexture dst)
@@ -672,7 +667,7 @@ public class SceneRenderer : MonoBehaviour
         //Compute color composition
         ColorCompositeUtils.ComputeCoverage(instanceIdBuffer);
         ColorCompositeUtils.CountInstances();
-        ColorCompositeUtils.ComputeColorComposition(ColorCompositeMaterial, colorBuffer, instanceIdBuffer, atomIdBuffer, depthBuffer);
+        ColorCompositeUtils.ComputeColorComposition(_camera, ColorCompositeMaterial, colorBuffer, instanceIdBuffer, atomIdBuffer, depthBuffer);
 
         // Compute contours detection
         SetContourShaderParams();
@@ -705,7 +700,19 @@ public class SceneRenderer : MonoBehaviour
         Graphics.Blit(null, src, CompositeMaterial, 0);
         Graphics.Blit(src, dst);
 
+
         Shader.SetGlobalTexture("_CameraDepthTexture", depthBuffer);
+
+        //if (DebugDOF)
+        //{
+        //    if (true)
+        //    {
+        //        _depthOfFieldComponent = GetComponent<DepthOfField>();
+        //    }
+
+        //    _depthOfFieldComponent.DebugFocus(src, dst);
+        //}
+
 
         ////Composite with scene depth
         //CompositeMaterial.SetTexture("_DepthTexture", depthBuffer);

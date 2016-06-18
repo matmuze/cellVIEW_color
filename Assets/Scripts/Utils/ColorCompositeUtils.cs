@@ -30,6 +30,35 @@ public struct DisplayInfo
 
 public static class ColorCompositeUtils
 {
+    public static void ComputeFocusScores(RenderTexture instanceIdBuffer, RenderTexture depthBuffer)
+    {
+        //ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(3, "_ClearBuffer", GPUBuffers.Get.ProteinFocusScore);
+        //ComputeShaderManager.Get.ComputeColorInfo.Dispatch(3, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
+
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(3, "_ClearBuffer", GPUBuffers.Get.ProteinFocusScore);
+        ComputeShaderManager.Get.ComputeColorInfo.Dispatch(3, Mathf.CeilToInt(SceneManager.Get.NumProteinInstances / 64.0f), 1, 1);
+        
+
+        //*************************************************//
+
+        GPUBuffers.Get.IngredientsColorInfo.SetData(CPUBuffers.Get.IngredientsDisplayInfo.ToArray());
+        GPUBuffers.Get.IngredientGroupsColorInfo.SetData(CPUBuffers.Get.IngredientGroupsDisplayInfo.ToArray());
+
+        ComputeShaderManager.Get.ComputeColorInfo.SetInt("_Width", instanceIdBuffer.width);
+        ComputeShaderManager.Get.ComputeColorInfo.SetInt("_Height", instanceIdBuffer.height);
+
+
+        ComputeShaderManager.Get.ComputeColorInfo.SetTexture(4, "_DepthBuffer", depthBuffer);
+        ComputeShaderManager.Get.ComputeColorInfo.SetTexture(4, "_InstanceIdBuffer", instanceIdBuffer);
+
+        //ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(4, "_IngredientsInfo", GPUBuffers.Get.IngredientsInfo);
+        //ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(4, "_LipidInstancesInfo", GPUBuffers.Get.LipidInstancesInfo);
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(4, "_ProteinInstancesInfo", GPUBuffers.Get.ProteinInstancesInfo);
+        ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(4, "_RWProteinFocusScore", GPUBuffers.Get.IngredientsColorInfo);
+
+        ComputeShaderManager.Get.ComputeColorInfo.Dispatch(4, Mathf.CeilToInt(instanceIdBuffer.width / 8.0f), Mathf.CeilToInt(instanceIdBuffer.height / 8.0f), 1);
+    }
+
     public static void ComputeCoverage(RenderTexture instanceIdBuffer)
     {
         ComputeShaderManager.Get.ComputeColorInfo.SetBuffer(3, "_ClearBuffer", GPUBuffers.Get.LipidInstanceVisibilityFlags);
@@ -98,7 +127,7 @@ public static class ColorCompositeUtils
         ComputeShaderManager.Get.ComputeColorInfo.Dispatch(2, Mathf.CeilToInt(SceneManager.Get.NumLipidInstances / 64.0f), 1, 1);
     }
 
-    public static void ComputeColorComposition(Material colorCompositeMaterial, RenderTexture dst, RenderTexture instanceIdBuffer, RenderTexture atomIdBuffer, RenderTexture depthBuffer)
+    public static void ComputeColorComposition(Camera camera, Material colorCompositeMaterial, RenderTexture dst, RenderTexture instanceIdBuffer, RenderTexture atomIdBuffer, RenderTexture depthBuffer)
     {
         var temp1 = new DisplayInfo[CPUBuffers.Get.IngredientsDisplayInfo.Count];
         var temp2 = new DisplayInfo[CPUBuffers.Get.IngredientGroupsDisplayInfo.Count];
@@ -119,10 +148,9 @@ public static class ColorCompositeUtils
         colorCompositeMaterial.SetFloat("_ShowChains", Convert.ToInt32(ColorManager.Get.ShowChains));
         colorCompositeMaterial.SetFloat("_ShowResidues", Convert.ToInt32(ColorManager.Get.ShowResidues));
         colorCompositeMaterial.SetFloat("_ShowSecondaryStructures", Convert.ToInt32(ColorManager.Get.ShowSecondaryStructures));
-
-
+        
         colorCompositeMaterial.SetFloat("_AtomDistance", ColorManager.Get.AtomDistance);
-        colorCompositeMaterial.SetFloat("_ChainDistance", GlobalProperties.Get.LodLevels[0].x);
+        colorCompositeMaterial.SetFloat("_ChainDistance", ColorManager.Get.ChainDistance);
         colorCompositeMaterial.SetFloat("_ResidueDistance", ColorManager.Get.ResidueDistance);
         colorCompositeMaterial.SetFloat("_SecondaryStructureDistance", ColorManager.Get.SecondaryStructureDistance);
 
@@ -137,6 +165,13 @@ public static class ColorCompositeUtils
             rangeValues[i] = distAcc;
         }
         rangeValues[ColorManager.Get.LevelRanges.Length] = ColorManager.Get.DistanceMax;
+
+        var selectionSphere = (Vector4)SelectionManager.Instance.SelectionGameObject.transform.position;
+        selectionSphere.w = SelectionManager.Instance.SelectionGameObject.GetComponent<SphereCollider>().radius;
+
+        colorCompositeMaterial.SetVector("_FocusSphere", selectionSphere);
+        colorCompositeMaterial.SetMatrix("_ProjectionMatrix", camera.projectionMatrix);
+        colorCompositeMaterial.SetMatrix("_InverseViewMatrix", camera.cameraToWorldMatrix);
 
         colorCompositeMaterial.SetInt("_UseDistanceLevels", Convert.ToInt32(ColorManager.Get.UseDistanceLevels));
         
