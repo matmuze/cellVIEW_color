@@ -135,6 +135,12 @@
 	//uniform float _depth;
 	//*****//
 
+	uniform float4 _FocusSphere;
+	uniform float4x4 _ProjectionMatrix;
+	uniform float4x4 _InverseViewMatrix;
+
+	/*******/
+
 	uniform float4 _DistanceLevels;
 
 	int GetLevelDistance(int level)
@@ -148,6 +154,11 @@
 		color = float4(1, 0, 0, 1);
 
 		int2 uv = i.uv * _ScreenParams.xy;
+			
+		float vz = LinearEyeDepth(_DepthBuffer[uv]);
+		float2 p11_22 = float2(_ProjectionMatrix._11, _ProjectionMatrix._22);
+		float3 vpos = float3((i.uv * 2 - 1) / p11_22, -1) * vz;
+		float4 wpos = mul(_InverseViewMatrix, float4(vpos, 1));
 				
 		int atomId = _AtomIdBuffer[uv];
 		int instanceId = _InstanceIdBuffer[uv];
@@ -178,6 +189,8 @@
 			lerpFactor =  (float)lengthCurrentEyePosSegment / (float)lengthTotalSegment;
 		}		
 		
+		
+
 		if (instanceId >= 100000)
 		{
 			float4 lipidAtomInfo = _LipidAtomInfos[atomId];
@@ -213,8 +226,7 @@
 				h = 360 - abs(h) % 360;
 			}
 
-			color = (_UseHCL == 0) ? float4(HSLtoRGB(float3(h / 360.0f , 0.75, 0.55)), 1) : float4(d3_hcl_lab(h, 75, 75), 1);
-			return;
+			color = (_UseHCL == 0) ? float4(HSLtoRGB(float3(h / 360.0f ,c, l)), 1) : float4(d3_hcl_lab(h, c, l), 1);
 		}
 		else if (instanceId >= 0)
 		{
@@ -326,11 +338,17 @@
 				//float l = 1.0f - 0.4f * (ingredientLocalIndex);
 				//float l = 0.5f + (ingredientGroupsColorRanges.z) * (ingredientLocalIndex - 0.5f) * ingredientGroupsLerpFactor;
 
-				float c = (_UseHCL == 0) ? 0.75 : 75;
-				float l = (_UseHCL == 0) ? 0.55 : 75;
+				
 				//float l = 0.55;
 				//float c = 75;
 				//float l = 75;
+
+				//float c = (_UseHCL == 0) ? 0.75 :45;
+				//float c = (_UseHCL == 0) ? 0.75 :60;
+				//float l = (_UseHCL == 0) ? 0.55 : 75;
+
+				float c = ingredientGroupsColorValues.y + (ingredientGroupsColorRanges.y) * (ingredientLocalIndex - 0.5f) * ingredientGroupsLerpFactor;
+				float l = ingredientGroupsColorValues.z + (ingredientGroupsColorRanges.z) * (ingredientLocalIndex - 0.5f) * ingredientGroupsLerpFactor;
 
 				float cc = max(eyeDepth - 10, 0);
 				float dd = _AtomDistance - 10;
@@ -360,107 +378,168 @@
 				//	}
 				//}		
 
-				if(_ShowChains && eyeDepth < _ChainDistance && proteinIngredientInfo.numChains > 1)
+				float _ChainBeginDistance = 50;
+				float _ChainEndDistance = 15;
+
+				float _SSBeginDistance = _ChainEndDistance;
+				float _SSEndDistance = 7;
+
+				float _AtomBeginDistance = _SSEndDistance;
+				float _AtomEndDistance = 2;
+
+				if(_ShowChains && eyeDepth < _ChainBeginDistance && proteinIngredientInfo.numChains > 1)
 				{
-					float cc = max(eyeDepth - 25, 0);
-					float dd = _ChainDistance - 25;
+					float cc = max(eyeDepth - _ChainEndDistance, 0);
+					float dd = _ChainBeginDistance - _ChainEndDistance;
+					float ddd = (1-(cc/dd));				
 
-					
-
-				//	float hueShift = 50;
-					float wedge = min(20 * proteinIngredientInfo.numChains, 180);
+					float wedge = min(50 * proteinIngredientInfo.numChains, 180);
 					float hueShift = wedge / proteinIngredientInfo.numChains;
-					//float hueShift = 50;
-					//hueShift = proteinIngredientInfo.numChains >= 3 ? 50 : hueShift;
-					//hueShift = proteinIngredientInfo.numChains >= 4 ? 50 : hueShift;
-					//hueShift = proteinIngredientInfo.numChains >= 5 ? 50 : hueShift;
-					//hueShift = proteinIngredientInfo.numChains >= 6 ? 50 : hueShift;		
-					//hueShift = proteinIngredientInfo.numChains >= 7 ? 40 : hueShift;		
-					//hueShift = proteinIngredientInfo.numChains >= 8 ? 30 : hueShift;		
-					//hueShift = proteinIngredientInfo.numChains >= 9 ? 30 : hueShift;		
-					//hueShift = proteinIngredientInfo.numChains >= 10 ? 15 : hueShift;		
-					//hueShift = proteinIngredientInfo.numChains >= 11 ? 10 : hueShift;		
-					//hueShift = proteinIngredientInfo.numChains >= 12 ? 10 : hueShift;	
-					hueShift *= (1-(cc/dd));
+					hueShift *= ddd;
 										
 					float hueLength = hueShift * (proteinIngredientInfo.numChains - 1);
 					float hueOffset = hueLength * 0.5;
 
 					h -=  hueOffset;
-					h += (atomInfo.chainSymbolId * hueShift);	
-					
-					//float chromaShift = (25 / (proteinIngredientInfo.numChains * 0.3)) * (1-(eyeDepth/40.0f)) ;
-					//float chromaOffset = proteinIngredientInfo.numChains * 0.5 * chromaShift;
-					//c +=  chromaOffset - (atomInfo.chainSymbolId * chromaShift);
-					
-					//float lumaShift = (25 / (proteinIngredientInfo.numChains * 0.3)) * (1-(eyeDepth/40.0f)) ;
-					//float lumaOffset = proteinIngredientInfo.numChains * 0.5 * lumaShift;
-					//l +=  lumaOffset - (atomInfo.chainSymbolId * lumaShift);					 
+					h += (atomInfo.chainSymbolId * hueShift);						
 				}
+
+				if(_ShowChains && _ShowSecondaryStructures && eyeDepth < _ChainBeginDistance)
+				{
+					float cc = max(eyeDepth - _ChainEndDistance, 0);
+					float dd = _ChainBeginDistance - _ChainEndDistance;
+					float ddd = (1-(cc/dd));				
+
+					float lumaShift = 10;
+					lumaShift *= ddd;					
+					l = (atomInfo.secondaryStructure == 0) ? l : (round(atomInfo.secondaryStructure) > 0) ? l - lumaShift : l + lumaShift;
+				}
+			
+				if(_ShowSecondaryStructures && eyeDepth < _SSBeginDistance)
+				{
+					float cc = max(eyeDepth - _SSEndDistance, 0);
+					float dd = _SSBeginDistance - _SSEndDistance;
+					float ddd = (1-(cc/dd));
+
+					float faktor = 45;
+					faktor *= ddd;
+						
+					h = (atomInfo.secondaryStructure == 0) ? h : (round(atomInfo.secondaryStructure) > 0) ? h - faktor : h + faktor;
+				}	
+
+				//if(true && _ShowAtoms && eyeDepth < _SSBeginDistance)
+				////if(_ShowChains && eyeDepth < _ChainBeginDistance)
+				//{
+				//	float cc = max(eyeDepth - _SSEndDistance, 0);
+				//	float dd = _SSBeginDistance - _SSEndDistance;
+				//	float ddd = (1-(cc/dd));
+										
+				//	float lg = l;
+				//	lg -= (1-(atomColor.x * 0.5 +  atomColor.y * 0.5 + atomColor.z * 0.0)) * 50;
+				//	l = lerp(l, lg, ddd);	
+				//}	
+
+				if(_ShowAtoms && eyeDepth < _ChainBeginDistance)
+				{	
+					float cc = max(eyeDepth - _ChainEndDistance, 0);
+					float dd = _ChainBeginDistance - _ChainEndDistance;
+					float ddd = (1-(cc/dd));					
+					if(atomInfo.atomSymbolId > 0) l -= 15 * ddd;	
+				}	
+
+				//if(_ShowSecondaryStructures && eyeDepth < _ChainBeginDistance)
+				//{
+				//	float cc = max(eyeDepth - _ChainEndDistance, 0);
+				//	float dd = _ChainBeginDistance - _ChainEndDistance;
+										
+
+				//	float wedge = min(20 * proteinIngredientInfo.numChains, 180);
+				//	float hueShift = wedge / proteinIngredientInfo.numChains;
+				//	hueShift *= (1-(cc/dd));
+										
+				//	float hueLength = hueShift * (proteinIngredientInfo.numChains - 1);
+				//	float hueOffset = hueLength * 0.5;
+
+				//	h -=  hueOffset;
+				//	h += (atomInfo.chainSymbolId * hueShift);	
+				//}
+
+
+				//if(atomInfo.chainSymbolId == 0) 
+				//{					
+				//	discard;
+				//}
+
+				//if(_ProteinAtomInfos2[atomId].x !=5) 
+				//{					
+				//	discard;
+				//}
+
+				
 
 				//this is old
-				if(_ShowSecondaryStructures && eyeDepth < _SecondaryStructureDistance)
-				{
-					float factor = (1-(eyeDepth / _SecondaryStructureDistance)) * 35;
-						//color = lerp(aminoAcidColor, atomColor, 1-factor);	
+				//if(_ShowSecondaryStructures && eyeDepth < _SecondaryStructureDistance)
+				//{
+				//	float factor = (1-(eyeDepth / _SecondaryStructureDistance)) * 35;
+				//		//color = lerp(aminoAcidColor, atomColor, 1-factor);	
 						
-						//c = (atomInfo.secondaryStructure <= 0) ? c : (round(atomInfo.secondaryStructure) <= 1) ? c - factor : c + factor;
-						// MWa: changed this with hue
-						//l = (atomInfo.secondaryStructure <= 0) ? l : (round(atomInfo.secondaryStructure) <= 1) ? l - factor : l + factor;
+				//		//c = (atomInfo.secondaryStructure <= 0) ? c : (round(atomInfo.secondaryStructure) <= 1) ? c - factor : c + factor;
+				//		// MWa: changed this with hue
+				//		//l = (atomInfo.secondaryStructure <= 0) ? l : (round(atomInfo.secondaryStructure) <= 1) ? l - factor : l + factor;
 
-						float totalnumsecondary = _ProteinAtomInfos2[atomId].y + _ProteinAtomInfos2[atomId].w + 1; //+1 so not zero
+				//		float totalnumsecondary = _ProteinAtomInfos2[atomId].y + _ProteinAtomInfos2[atomId].w + 1; //+1 so not zero
 
-						float wedge = min(20 * totalnumsecondary, 180);
-						float hueShift = wedge / totalnumsecondary;
+				//		float wedge = min(20 * totalnumsecondary, 180);
+				//		float hueShift = wedge / totalnumsecondary;
 
-						float myvalue = 0;
-						if(atomInfo2.x < 0){
-						color = float4(1,1,0,1);
-							return;}
-							if(atomInfo2.z > 0){
-						color = float4(1,1,1,1);
-							return;}
-							if(atomInfo2.y < 0){
-						color = float4(1,1,1,1);
-							return;}
-							if(atomInfo2.w < 0){
-						color = float4(1,1,1,1);
-							return;}
-						if(atomInfo2.x - atomInfo2.z == 0){
-							myvalue = (atomInfo2.y + atomInfo2.w)/2;
-							}
-						else{
-							myvalue = atomInfo2.x>0 ? atomInfo2.x : atomInfo2.y - atomInfo2.z; //z is sheet and negative
-							if (myvalue >= (atomInfo2.y + atomInfo2.w)/2-0.000001){
-								myvalue += 1;}
+				//		float myvalue = 0;
+				//		if(atomInfo2.x < 0){
+				//		color = float4(1,1,0,1);
+				//			return;}
+				//			if(atomInfo2.z > 0){
+				//		color = float4(1,1,1,1);
+				//			return;}
+				//			if(atomInfo2.y < 0){
+				//		color = float4(1,1,1,1);
+				//			return;}
+				//			if(atomInfo2.w < 0){
+				//		color = float4(1,1,1,1);
+				//			return;}
+				//		if(atomInfo2.x - atomInfo2.z == 0){
+				//			myvalue = (atomInfo2.y + atomInfo2.w)/2;
+				//			}
+				//		else{
+				//			myvalue = atomInfo2.x>0 ? atomInfo2.x : atomInfo2.y - atomInfo2.z; //z is sheet and negative
+				//			if (myvalue >= (atomInfo2.y + atomInfo2.w)/2-0.000001){
+				//				myvalue += 1;}
 
-							}
+				//			}
 
 						
 
-						float cc = max(eyeDepth - 10, 0);
-						float dd = _SecondaryStructureDistance - 10;
-						hueShift *= (1-(cc/dd));
-						float hueLength = hueShift * (totalnumsecondary-1);
-						float hueOffset = hueLength * 0.5;
+				//		float cc = max(eyeDepth - 10, 0);
+				//		float dd = _SecondaryStructureDistance - 10;
+				//		hueShift *= (1-(cc/dd));
+				//		float hueLength = hueShift * (totalnumsecondary-1);
+				//		float hueOffset = hueLength * 0.5;
 										
-					//	hueLength = hueShift;
-					//	hueOffset = hueLength * 0.5;
+				//	//	hueLength = hueShift;
+				//	//	hueOffset = hueLength * 0.5;
 
-						h -=  hueOffset;
-						h += (myvalue * hueShift);	
+				//		h -=  hueOffset;
+				//		h += (myvalue * hueShift);	
 
-						float lFactor  = (1-(eyeDepth / _SecondaryStructureDistance)); 
-						float lg = 60;
-						lg += atomColor.x * 10;
-						lg += atomColor.y * 40;
-						lg += atomColor.z * 2;
-						//l = lerp(l, lg, lFactor);	
+				//		float lFactor  = (1-(eyeDepth / _SecondaryStructureDistance)); 
+				//		float lg = 60;
+				//		lg += atomColor.x * 10;
+				//		lg += atomColor.y * 40;
+				//		lg += atomColor.z * 2;
+				//		//l = lerp(l, lg, lFactor);	
 
-						//if(atomInfo.secondaryStructure == 0) l=0;
-						//MWa: end
-				}
-				
+				//		//if(atomInfo.secondaryStructure == 0) l=0;
+				//		//MWa: end
+				//}
+
 				if (h >= 0)
 				{
 					h = h % 360;
@@ -470,29 +549,23 @@
 					h = 360 - abs(h) % 360;
 				}
 				
+								
+
 				color = (_UseHCL == 0) ? float4(HSLtoRGB(float3(h / 360.0f , c, l)), 1) : float4(d3_hcl_lab(h, c, l), 1);
 				color.xyz = max(color.xyz, float3(0,0,0));
 				color.xyz = min(color.xyz, float3(1,1,1));
+							
 
-
-				//if(eyeDepth < _SecondaryStructureDistance)
-				//{
-				//	if(_ShowSecondaryStructures)
-				//	{
-				//		float factor = (1-((eyeDepth - _AtomDistance) / (_SecondaryStructureDistance - _AtomDistance)));
-				//		color = lerp(color, secondaryStructureColor, factor);							
-				//		//c = (atomInfo.secondaryStructure <= 0) ? c : (round(atomInfo.secondaryStructure) <= 1) ? c - factor : c + factor;
-				//		//l = (atomInfo.secondaryStructure <= 0) ? l : (round(atomInfo.secondaryStructure) <= 1) ? l - factor : l + factor;
-				
-				//	}
-				//}	
-				
-				if(_ShowAtoms && eyeDepth < _AtomDistance)
+				if(_ShowAtoms && eyeDepth < _AtomBeginDistance)
 				{
-					float factor = min((1-((eyeDepth) / (_AtomDistance))),1);
-					color.xyz = max(color.xyz, float3(0,0,0));
-					color.xyz = (lerp(color.xyz, atomColor.xyz, factor));						
-				}	
+					float cc = max(eyeDepth - _AtomEndDistance, 0);
+					float dd = _AtomBeginDistance - _AtomEndDistance;
+					float ddd = (1-(cc/dd));
+
+					color.xyz = (lerp(color.xyz, atomColor.xyz, ddd));		
+				}
+
+				
 
 				//if(eyeDepth < _AtomDistance)
 				//{
@@ -522,13 +595,45 @@
 				//		color = lerp(color, secondaryStructureColor, 1-factor);						
 				//	}
 				//}
+
+				//if(eyeDepth < _SecondaryStructureDistance)
+				//{
+				//	if(_ShowSecondaryStructures)
+				//	{
+				//		float factor = (1-((eyeDepth - _AtomDistance) / (_SecondaryStructureDistance - _AtomDistance)));
+				//		color = lerp(color, secondaryStructureColor, factor);							
+				//		//c = (atomInfo.secondaryStructure <= 0) ? c : (round(atomInfo.secondaryStructure) <= 1) ? c - factor : c + factor;
+				//		//l = (atomInfo.secondaryStructure <= 0) ? l : (round(atomInfo.secondaryStructure) <= 1) ? l - factor : l + factor;
 				
-			}		
+				//	}
+				//}										
+			}				
 		}
 		else
 		{
 			// abort the shader for this pixel
 			discard;
+		}
+
+		// Destaturation computation
+
+		float ddd = max(distance(_FocusSphere.xyz, wpos) - _FocusSphere.w, 0);				
+		float ddddd = distance(_WorldSpaceCameraPos, _FocusSphere.xyz);
+
+		float _DeturationBeginDistance = 25;
+		float _DesaturationEndDistance = 10;
+
+		if(	ddd > 0 &&  ddddd < 40 && true)
+		//if(reuw)
+		{
+			float dde = clamp((ddddd - _DesaturationEndDistance) / (_DeturationBeginDistance -_DesaturationEndDistance),0, 1);
+			//color = float4(dde,0,0,1);
+
+			float dddd =  clamp(ddd / 10, 0, 1);  // Radius of the destaturation sphere
+
+			float3 hsv =  RGBtoHSV(color.xyz);
+			hsv.y *= max(clamp(1-(dddd * (1-dde)),0, 1),0.15);				
+			color.xyz =  HSVtoRGB(hsv);
 		}
 	}
 	
